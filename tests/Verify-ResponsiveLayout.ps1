@@ -31,6 +31,23 @@ function Assert-True {
     }
 }
 
+function Get-RelativeBounds {
+    param(
+        [System.Windows.FrameworkElement]$Element,
+        [System.Windows.FrameworkElement]$RelativeTo
+    )
+
+    $origin = $Element.TranslatePoint((New-Object System.Windows.Point(0, 0)), $RelativeTo)
+    return [pscustomobject]@{
+        Left = $origin.X
+        Top = $origin.Y
+        Right = $origin.X + $Element.ActualWidth
+        Bottom = $origin.Y + $Element.ActualHeight
+        Width = $Element.ActualWidth
+        Height = $Element.ActualHeight
+    }
+}
+
 function Wait-ForLayoutIdle {
     [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke(
         [Action] { },
@@ -64,16 +81,28 @@ $controlWindow.UpdateLayout()
 Wait-ForLayoutIdle
 
 $rootScrollViewer = $control.FindName('RootScrollViewer')
+$mainTabControl = $control.FindName('MainTabControl')
 $headerActionsPanel = $control.FindName('HeaderActionsPanel')
-$homeFontsMetricsGrid = $control.FindName('HomeFontsMetricsGrid')
-$homeColorsMetricsGrid = $control.FindName('HomeColorsMetricsGrid')
+$headerVisualPanel = $control.FindName('HeaderVisualPanel')
+$headerGraphicShell = $control.FindName('HeaderGraphicShell')
+$homeGraphicShell = $control.FindName('HomeGraphicShell')
+$homeSignalsBoard = $control.FindName('HomeSignalsBoard')
+$fontsTab = $control.FindName('FontsTab')
+$colorsTab = $control.FindName('ColorsTab')
+$homeTab = $control.FindName('HomeTab')
 $fontTableHeaderRow = $control.FindName('FontTableHeaderRow')
 $colorTableHeaderRow = $control.FindName('ColorTableHeaderRow')
+$tabHeaderStrip = $mainTabControl.Template.FindName('TabHeaderStrip', $mainTabControl)
 
 Assert-True ($null -ne $rootScrollViewer) 'Fonts user control should expose RootScrollViewer for layout verification.'
+Assert-True ($null -ne $mainTabControl) 'Fonts user control should expose MainTabControl for layout verification.'
 Assert-True ($null -ne $headerActionsPanel) 'Fonts user control should expose HeaderActionsPanel for compact layout verification.'
-Assert-True ($null -ne $homeFontsMetricsGrid) 'Fonts user control should expose HomeFontsMetricsGrid for compact layout verification.'
-Assert-True ($null -ne $homeColorsMetricsGrid) 'Fonts user control should expose HomeColorsMetricsGrid for compact layout verification.'
+Assert-True ($null -ne $headerVisualPanel) 'Fonts user control should expose HeaderVisualPanel for compact layout verification.'
+Assert-True ($null -ne $headerGraphicShell) 'Fonts user control should expose HeaderGraphicShell for responsive layout verification.'
+Assert-True ($null -ne $homeGraphicShell) 'Fonts user control should expose HomeGraphicShell for responsive layout verification.'
+Assert-True ($null -ne $homeSignalsBoard) 'Fonts user control should expose HomeSignalsBoard for home layout verification.'
+Assert-True ($null -ne $tabHeaderStrip) 'Fonts user control should expose a custom tab header strip.'
+Assert-True ($null -ne $fontsTab -and $null -ne $colorsTab -and $null -ne $homeTab) 'Fonts user control should expose all workspace tabs.'
 Assert-True ($null -ne $fontTableHeaderRow) 'Fonts user control should expose FontTableHeaderRow for responsive table verification.'
 Assert-True ($null -ne $colorTableHeaderRow) 'Fonts user control should expose ColorTableHeaderRow for responsive table verification.'
 
@@ -82,16 +111,31 @@ if ($rootScrollViewer -ne $null) {
 }
 
 if ($headerActionsPanel -ne $null) {
-    Assert-True ([System.Windows.Controls.Grid]::GetRow($headerActionsPanel) -eq 1) 'Header actions should stack below the title in compact mode.'
-    Assert-True ([System.Windows.Controls.Grid]::GetColumn($headerActionsPanel) -eq 0) 'Header actions should align with the content column in compact mode.'
+    Assert-True ($headerActionsPanel.HorizontalAlignment -eq [System.Windows.HorizontalAlignment]::Left) 'Header actions should align left in compact mode.'
 }
 
-if ($homeFontsMetricsGrid -ne $null) {
-    Assert-True ($homeFontsMetricsGrid.Columns -eq 1) 'Font metric cards should collapse to one column in compact mode.'
+if ($headerVisualPanel -ne $null) {
+    Assert-True ([System.Windows.Controls.Grid]::GetRow($headerVisualPanel) -eq 1) 'Header visuals should stack below the copy in compact mode.'
+    Assert-True ([System.Windows.Controls.Grid]::GetColumn($headerVisualPanel) -eq 0) 'Header visuals should align with the content column in compact mode.'
 }
 
-if ($homeColorsMetricsGrid -ne $null) {
-    Assert-True ($homeColorsMetricsGrid.Columns -eq 1) 'Color metric cards should collapse to one column in compact mode.'
+if ($headerGraphicShell -ne $null) {
+    Assert-True ($headerGraphicShell.Visibility -eq [System.Windows.Visibility]::Collapsed) 'Header graphic should hide in very narrow layouts.'
+}
+
+if ($homeGraphicShell -ne $null) {
+    Assert-True ($homeGraphicShell.Visibility -eq [System.Windows.Visibility]::Collapsed) 'Home graphic should hide in very narrow layouts.'
+}
+
+if ($tabHeaderStrip -ne $null -and $fontsTab -ne $null -and $colorsTab -ne $null -and $homeTab -ne $null) {
+    $stripBounds = Get-RelativeBounds -Element $tabHeaderStrip -RelativeTo $mainTabControl
+    $fontsBounds = Get-RelativeBounds -Element $fontsTab -RelativeTo $mainTabControl
+    $colorsBounds = Get-RelativeBounds -Element $colorsTab -RelativeTo $mainTabControl
+    $homeBounds = Get-RelativeBounds -Element $homeTab -RelativeTo $mainTabControl
+
+    Assert-True ($fontsBounds.Right -le ($colorsBounds.Left + 0.5)) 'Fonts and Colors tab headers should not overlap in compact mode.'
+    Assert-True ($colorsBounds.Right -le ($homeBounds.Left + 0.5)) 'Colors and Home tab headers should not overlap in compact mode.'
+    Assert-True ($homeBounds.Right -le ($stripBounds.Right + 1)) 'Home tab header should stay within the custom tab strip.'
 }
 
 if ($fontTableHeaderRow -ne $null) {
@@ -102,21 +146,25 @@ if ($colorTableHeaderRow -ne $null) {
     Assert-True ($colorTableHeaderRow.Visibility -eq [System.Windows.Visibility]::Collapsed) 'Color table header should collapse in narrow layouts.'
 }
 
-$controlWindow.Width = 520
+$controlWindow.Width = 620
 $controlWindow.UpdateLayout()
 Wait-ForLayoutIdle
 
 if ($headerActionsPanel -ne $null) {
-    Assert-True ([System.Windows.Controls.Grid]::GetRow($headerActionsPanel) -eq 0) 'Header actions should return to the title row in wide mode.'
-    Assert-True ([System.Windows.Controls.Grid]::GetColumn($headerActionsPanel) -eq 1) 'Header actions should return to the action column in wide mode.'
+    Assert-True ($headerActionsPanel.HorizontalAlignment -eq [System.Windows.HorizontalAlignment]::Right) 'Header actions should align right in wide mode.'
 }
 
-if ($homeFontsMetricsGrid -ne $null) {
-    Assert-True ($homeFontsMetricsGrid.Columns -eq 2) 'Font metric cards should expand back to two columns in wide mode.'
+if ($headerVisualPanel -ne $null) {
+    Assert-True ([System.Windows.Controls.Grid]::GetRow($headerVisualPanel) -eq 0) 'Header visuals should return to the first row in wide mode.'
+    Assert-True ([System.Windows.Controls.Grid]::GetColumn($headerVisualPanel) -eq 1) 'Header visuals should return to the rail column in wide mode.'
 }
 
-if ($homeColorsMetricsGrid -ne $null) {
-    Assert-True ($homeColorsMetricsGrid.Columns -eq 2) 'Color metric cards should expand back to two columns in wide mode.'
+if ($headerGraphicShell -ne $null) {
+    Assert-True ($headerGraphicShell.Visibility -eq [System.Windows.Visibility]::Visible) 'Header graphic should return in wide layouts.'
+}
+
+if ($homeGraphicShell -ne $null) {
+    Assert-True ($homeGraphicShell.Visibility -eq [System.Windows.Visibility]::Visible) 'Home graphic should return in wide layouts.'
 }
 
 if ($fontTableHeaderRow -ne $null) {

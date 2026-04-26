@@ -2,6 +2,10 @@
 
 PowerPoint cleanup, without leaving PowerPoint.
 
+![Morphos mark](docs/assets/morphos-mark.svg)
+
+![Morphos task pane](docs/assets/morphos-task-pane-home.png)
+
 Morphos is a Windows VSTO add-in for Microsoft PowerPoint that scans the active deck, highlights the font and color issues worth fixing, and lets you repair them from a compact task pane. It is built for real cleanup work: missing fonts, inconsistent replacements, slow rescans, and the friction of jumping between slide fixes and file-level fixes.
 
 ## What Morphos does
@@ -125,3 +129,7 @@ Morphos currently targets:
 - x64 builds
 
 It is not intended for PowerPoint for the web or macOS.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 
 $pythonScriptPath = Join-Path $PSScriptRoot "morphos_ui_harness.py"
 
-foreach ($mode in @("autoscan", "open-font-dialog", "open-color-dialog")) {
+foreach ($mode in @("autoscan", "cycle-tabs", "open-font-dialog", "open-color-dialog")) {
     python $pythonScriptPath --presentation $PresentationPath --mode $mode
     if ($LASTEXITCODE -ne 0) {
         throw "PowerPoint interactive pane verification failed during mode '$mode'."

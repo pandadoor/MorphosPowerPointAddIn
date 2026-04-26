@@ -323,9 +323,9 @@ def wait_for_dialog_resolution(container, dialog_title, timeout=15.0):
 
 def ensure_pane_tab_selected(pane, tab_title):
     marker_map = {
-        "Fonts": ("Replace font", "Button"),
-        "Colors": ("Replace color", "Button"),
-        "Home": ("Overview", "Text"),
+        "Fonts": ("Font inventory", "Text"),
+        "Colors": ("Color inventory", "Text"),
+        "Home": ("At a glance", "Text"),
     }
 
     marker_title, marker_type = marker_map.get(tab_title, (tab_title, "Text"))
@@ -476,6 +476,19 @@ def run_open_font_dialog(application, presentation_path):
     return temp_path
 
 
+def run_cycle_tabs(application, presentation_path):
+    application, _, temp_path = open_temp_copy(application, presentation_path)
+    window = get_powerpoint_window(os.path.basename(temp_path))
+    pane = ensure_morphos_pane(window, reset_visibility=True)
+
+    for tab_title in ("Home", "Fonts", "Colors", "Home"):
+        ensure_pane_tab_selected(pane, tab_title)
+        time.sleep(0.5)
+
+    log(f"Tab navigation succeeded for {os.path.basename(temp_path)}.")
+    return temp_path
+
+
 def run_replace_font(application, presentation_path):
     application, _, temp_path = open_temp_copy(application, presentation_path)
     window = get_powerpoint_window(os.path.basename(temp_path))
@@ -596,7 +609,7 @@ def main():
     parser.add_argument(
         "--mode",
         default="all",
-        choices=["autoscan", "open-font-dialog", "replace-font", "open-color-dialog", "replace-color", "all"],
+        choices=["autoscan", "cycle-tabs", "open-font-dialog", "replace-font", "open-color-dialog", "replace-color", "all"],
     )
     args = parser.parse_args()
 
@@ -611,6 +624,9 @@ def main():
 
         if args.mode in ("autoscan", "all"):
             run_autoscan(application, args.presentation)
+
+        if args.mode in ("cycle-tabs", "all"):
+            run_cycle_tabs(application, args.presentation)
 
         if args.mode in ("open-font-dialog", "all"):
             run_open_font_dialog(application, args.presentation)

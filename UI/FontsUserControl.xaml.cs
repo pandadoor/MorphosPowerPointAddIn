@@ -9,10 +9,10 @@ namespace MorphosPowerPointAddIn.UI
 {
     public partial class FontsUserControl : UserControl
     {
-        private const double CompactPaneWidthThreshold = 500;
-        private const double CompactTableWidthThreshold = 500;
-        private const double WorkspaceSplitWidthThreshold = 760;
-        private const double SingleColumnMetricsWidthThreshold = 390;
+        private const double CompactPaneWidthThreshold = 540;
+        private const double CompactTableWidthThreshold = 560;
+        private const double WorkspaceSplitWidthThreshold = 860;
+        private const double GraphicVisibilityWidthThreshold = 360;
         private readonly FontsPaneViewModel _viewModel;
 
         public static readonly DependencyProperty IsNarrowTableLayoutProperty =
@@ -210,17 +210,7 @@ namespace MorphosPowerPointAddIn.UI
             var isCompact = width > 0 && width < CompactPaneWidthThreshold;
             IsNarrowTableLayout = width > 0 && width < CompactTableWidthThreshold;
             var useSplitWorkspace = width >= WorkspaceSplitWidthThreshold;
-            var useSingleMetricColumn = width > 0 && width < SingleColumnMetricsWidthThreshold;
-
-            if (HomeFontsMetricsGrid != null)
-            {
-                HomeFontsMetricsGrid.Columns = useSingleMetricColumn ? 1 : 2;
-            }
-
-            if (HomeColorsMetricsGrid != null)
-            {
-                HomeColorsMetricsGrid.Columns = useSingleMetricColumn ? 1 : 2;
-            }
+            var showGraphics = width <= 0 || width >= GraphicVisibilityWidthThreshold;
 
             if (FontTableHeaderRow != null)
             {
@@ -244,36 +234,50 @@ namespace MorphosPowerPointAddIn.UI
                 ColorsDetailPanel,
                 useSplitWorkspace);
 
-            if (HeaderActionsPanel == null)
+            if (HeaderGraphicShell != null)
+            {
+                HeaderGraphicShell.Visibility = showGraphics ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            if (HomeGraphicShell != null)
+            {
+                HomeGraphicShell.Visibility = showGraphics ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            if (HeaderActionsPanel == null || HeaderVisualPanel == null)
             {
                 return;
             }
 
             if (isCompact)
             {
-                Grid.SetRow(HeaderActionsPanel, 1);
-                Grid.SetColumn(HeaderActionsPanel, 0);
-                Grid.SetColumnSpan(HeaderActionsPanel, 2);
+                Grid.SetRow(HeaderVisualPanel, 1);
+                Grid.SetColumn(HeaderVisualPanel, 0);
+                Grid.SetColumnSpan(HeaderVisualPanel, 2);
+                HeaderVisualPanel.HorizontalAlignment = HorizontalAlignment.Left;
+                HeaderVisualPanel.Margin = new Thickness(0, 12, 0, 0);
                 HeaderActionsPanel.HorizontalAlignment = HorizontalAlignment.Left;
-                HeaderActionsPanel.Margin = new Thickness(0, 10, 0, 0);
+                HeaderActionsPanel.Margin = new Thickness(0, 12, 0, 0);
 
                 if (RefreshButton != null)
                 {
-                    RefreshButton.MinWidth = 0;
+                    RefreshButton.MinWidth = 84;
                 }
 
                 return;
             }
 
-            Grid.SetRow(HeaderActionsPanel, 0);
-            Grid.SetColumn(HeaderActionsPanel, 1);
-            Grid.SetColumnSpan(HeaderActionsPanel, 1);
+            Grid.SetRow(HeaderVisualPanel, 0);
+            Grid.SetColumn(HeaderVisualPanel, 1);
+            Grid.SetColumnSpan(HeaderVisualPanel, 1);
+            HeaderVisualPanel.HorizontalAlignment = HorizontalAlignment.Right;
+            HeaderVisualPanel.Margin = new Thickness(0);
             HeaderActionsPanel.HorizontalAlignment = HorizontalAlignment.Right;
-            HeaderActionsPanel.Margin = new Thickness(0);
+            HeaderActionsPanel.Margin = new Thickness(0, 12, 0, 0);
 
             if (RefreshButton != null)
             {
-                RefreshButton.MinWidth = 80;
+                RefreshButton.MinWidth = 96;
             }
         }
 
