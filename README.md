@@ -3,90 +3,92 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Platform-Windows-blue.svg" alt="Platform">
-  <img src="https://img.shields.io/badge/License-MIT-gold.svg" alt="License">
-  <img src="https://img.shields.io/badge/Build-VSTO-brown.svg" alt="Build">
-  <img src="https://img.shields.io/badge/PowerPoint-2016+-orange.svg" alt="PowerPoint">
+  <img src="docs/assets/morphos-icon.png" alt="Morphos Icon" width="120">
+</p>
+
+<h1 align="center">Morphos</h1>
+
+<p align="center">
+  <strong>Integrated Presentation Inspection and Cleanup for Microsoft PowerPoint</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Windows-0078D4?style=flat-square" alt="Platform">
+  <img src="https://img.shields.io/badge/License-MIT-A86B27?style=flat-square" alt="License">
+  <img src="https://img.shields.io/badge/Build-VSTO-5C2D91?style=flat-square" alt="Build">
+  <img src="https://img.shields.io/badge/PowerPoint-2016+-D83B01?style=flat-square" alt="PowerPoint">
 </p>
 
 ---
 
-# Morphos
+## Overview
 
-### PowerPoint cleanup, without leaving PowerPoint.
+Morphos is a professional-grade VSTO (Visual Studio Tools for Office) add-in for Microsoft PowerPoint. It provides a centralized workspace within the PowerPoint environment to identify and resolve inconsistencies in fonts and colors. By consolidating fragmented cleanup tasks into a responsive task pane, Morphos enhances productivity and ensures presentation integrity.
 
-**Morphos** is a professional-grade Windows VSTO add-in for Microsoft PowerPoint designed to streamline the deck cleanup process. It scans your active presentation, identifies critical font and color inconsistencies, and provides a focused workspace to repair them—all from a compact, responsive task pane.
+## Core Functionality
 
-## ✨ Why Morphos?
+### Automated Presentation Auditing
+The system performs real-time scans of the active presentation to surface critical issues that impact deck quality.
 
-PowerPoint cleanup is traditionally a fragmented process involving multiple dialogs and manual slide inspection. Morphos consolidates this workflow into four intuitive steps:
-1.  **Scan**: Automatically audit your deck's internal structure.
-2.  **Inspect**: Visualize hidden issues like missing fonts or non-theme colors.
-3.  **Replace**: Execute precise, bulk repairs safely.
-4.  **Verify**: Confirm your deck is professional and consistent.
+*   **Font Inventory Management**: Detects missing, non-installed, and embedded fonts.
+*   **Color Usage Analysis**: Identifies direct RGB color usage and highlights theme inconsistencies.
+*   **Slide-Level Drilldown**: Enables direct navigation to the specific slides containing identified issues.
 
----
+### Precision Cleanup Tools
+Morphos facilitates safe and efficient bulk modifications without requiring the user to navigate through multiple native dialogs.
 
-## 🚀 Key Capabilities
+*   **Intelligent Font Replacement**: Validates replacement targets against system fonts and active theme tokens.
+*   **Theme Alignment**: Simplifies the conversion of ad-hoc colors to standardized theme-linked colors.
+*   **Safe Execution**: Implements validation layers to ensure modifications are technically sound before execution.
 
-### 🔎 Intelligent Font Inventory
-*   **Audit**: View usage counts, installation status, and embedding states.
-*   **Drilldown**: Jump directly to specific slides containing the target font.
-*   **Safe Replacement**: Validate replacement targets against real system fonts and active theme tokens.
+### Performance Optimization
+Designed for professional use cases involving large-scale presentations.
 
-### 🎨 Precise Color Management
-*   **Inventory**: Group direct RGB color usage into actionable cleanup tables.
-*   **Theme Alignment**: Identify colors that *should* be theme-linked and convert them in bulk.
-*   **Visual Context**: Navigate slide-by-slide to see exactly where colors are being used.
-
-### ⚡ Optimized for Performance
-*   **Open XML Speed**: Uses low-level package scanning to avoid COM-heavy overhead on large decks.
-*   **Smart Caching**: Reuses presentation snapshots (`FontScanSessionCache`) to keep repeated scans lightning-fast.
-*   **Robust Interop**: Built-in retry helpers and busy-state filters to ensure stability during intensive PowerPoint operations.
+*   **Open XML Integration**: Utilizes low-level package inspection for high-performance scanning.
+*   **Smart Caching**: Employs the `FontScanSessionCache` to minimize redundant processing during repeated operations.
+*   **Stability Framework**: Built-in retry mechanisms and Office interop filters manage transient application states reliably.
 
 ---
 
-## 🛠 Architecture at a Glance
+## Technical Architecture
 
-Morphos is built with a clean, layered architecture that separates Office interop from business logic and UI:
+The project follows a layered architecture to ensure maintainability and high performance:
 
-- **Core Hosting**: `ThisAddIn.cs` manages the lifecycle and task-pane integration.
-- **Service Layer**: `PowerPointPresentationService.cs` orchestrates scans and mutations.
-- **Fast Paths**: `OpenXml*.cs` provides direct package inspection for high-volume decks.
-- **Modern UI**: WPF-based task pane with responsive layouts and MVVM state management.
+*   **Host Layer**: Managed via `ThisAddIn.cs` for application lifecycle and UI integration.
+*   **Logic Layer**: Orchestrated by `PowerPointPresentationService.cs` for scanning and mutation.
+*   **Data Access**: Optimized through Open XML services for direct package-level interaction.
+*   **Interface**: Built with WPF to provide a modern, responsive user experience within the task pane.
 
 ---
 
-## 🏁 Quick Start
+## Installation and Deployment
 
-### 1. Clone the Repository
-```powershell
-git clone https://github.com/pandadoor/MorphosPowerPointAddIn.git
-cd MorphosPowerPointAddIn
-```
+### 1. Prerequisites
+Ensure the environment meets the following requirements:
+*   Microsoft PowerPoint 2016 or newer (Windows)
+*   .NET Framework 4.8
+*   Visual Studio Build Tools (for local compilation)
 
-### 2. Build and Install
-Run the automation script to handle everything from compilation to registry registration:
+### 2. Automated Setup
+The provided automation script handles the end-to-end deployment process, including compilation and registry registration:
+
 ```powershell
 .\build-and-run.ps1
 ```
-*The script rebuilds the add-in, configures the local VSTO manifest, and launches PowerPoint automatically.*
 
-### 3. Open the Inspector
-1.  Open any PowerPoint presentation.
-2.  Navigate to the **Morphos** tab on the Ribbon.
-3.  Click **Open Inspector** to begin your scan.
+### 3. Usage
+Once installed, the add-in is accessible via the **Morphos** tab on the PowerPoint Ribbon. Click **Open Inspector** to launch the task pane.
 
 ---
 
-## 📄 Licensing & Documentation
+## Documentation and Licensing
 
-*   **License**: This project is licensed under the [MIT License](LICENSE).
-*   **Setup Guide**: See [docs/INSTALLATION.md](docs/INSTALLATION.md) for environment requirements.
-*   **Developer Notes**: See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for build and testing details.
+*   **Licensing**: This software is released under the [MIT License](LICENSE).
+*   **Setup Details**: Refer to [docs/INSTALLATION.md](docs/INSTALLATION.md) for detailed configuration.
+*   **Development**: Technical specifications are available in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ---
 
 <p align="center">
-  <i>Built for precision. Designed for efficiency.</i>
+  <em>Engineering efficiency into every presentation.</em>
 </p>
