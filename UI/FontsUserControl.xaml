@@ -1,0 +1,1401 @@
+<UserControl x:Class="MorphosPowerPointAddIn.UI.FontsUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:models="clr-namespace:MorphosPowerPointAddIn.Models"
+             xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
+             xmlns:viewModels="clr-namespace:MorphosPowerPointAddIn.ViewModels"
+             mc:Ignorable="d"
+             d:DesignHeight="760"
+             d:DesignWidth="420"
+             MinWidth="250"
+             MinHeight="300"
+             SizeChanged="FontsUserControl_SizeChanged"
+             SnapsToDevicePixels="True"
+             UseLayoutRounding="True"
+             FontFamily="Aptos">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <LinearGradientBrush x:Key="PageBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#F5EFE4" Offset="0" />
+            <GradientStop Color="#FCFAF5" Offset="0.52" />
+            <GradientStop Color="#EFE5D7" Offset="1" />
+        </LinearGradientBrush>
+
+        <SolidColorBrush x:Key="ShellBrush" Color="#FFFDF8" />
+        <SolidColorBrush x:Key="ShellBorderBrush" Color="#E6DDCF" />
+        <SolidColorBrush x:Key="CardBrush" Color="#FFFCF7" />
+        <SolidColorBrush x:Key="CardBorderBrush" Color="#E7DECF" />
+        <SolidColorBrush x:Key="SoftCardBrush" Color="#F6F0E6" />
+        <SolidColorBrush x:Key="LineBrush" Color="#DED2C0" />
+        <SolidColorBrush x:Key="TableDividerBrush" Color="#E7DECF" />
+        <SolidColorBrush x:Key="HoverBrush" Color="#F5EEE3" />
+        <SolidColorBrush x:Key="SelectionBrush" Color="#F2E8DB" />
+        <SolidColorBrush x:Key="SelectionBorderBrush" Color="#D8C1A4" />
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#25201A" />
+        <SolidColorBrush x:Key="PrimaryBorderBrush" Color="#25201A" />
+        <SolidColorBrush x:Key="PrimarySoftBrush" Color="#F3E8DA" />
+        <SolidColorBrush x:Key="PrimarySoftBorderBrush" Color="#DFC7AE" />
+        <SolidColorBrush x:Key="GoldBrush" Color="#A86B27" />
+        <SolidColorBrush x:Key="GoldSoftBrush" Color="#FFF3E3" />
+        <SolidColorBrush x:Key="GoldBorderBrush" Color="#E9CBAA" />
+        <SolidColorBrush x:Key="SuccessBrush" Color="#2F7064" />
+        <SolidColorBrush x:Key="SuccessSoftBrush" Color="#E8F2ED" />
+        <SolidColorBrush x:Key="SuccessBorderBrush" Color="#C8DED5" />
+        <SolidColorBrush x:Key="DangerBrush" Color="#A95542" />
+        <SolidColorBrush x:Key="DangerSoftBrush" Color="#F8E9E4" />
+        <SolidColorBrush x:Key="DangerBorderBrush" Color="#E5C4BB" />
+        <SolidColorBrush x:Key="ChipBrush" Color="#F2EBDD" />
+        <SolidColorBrush x:Key="ChipBorderBrush" Color="#E0D1BE" />
+        <SolidColorBrush x:Key="TextBrush" Color="#1F1A15" />
+        <SolidColorBrush x:Key="MutedBrush" Color="#6A5F50" />
+        <SolidColorBrush x:Key="WeakTextBrush" Color="#938878" />
+
+        <DropShadowEffect x:Key="ShellShadowEffect"
+                          BlurRadius="22"
+                          Direction="270"
+                          ShadowDepth="0"
+                          Color="#2D241C"
+                          Opacity="0.08" />
+
+        <DropShadowEffect x:Key="CardShadowEffect"
+                          BlurRadius="14"
+                          Direction="270"
+                          ShadowDepth="0"
+                          Color="#2D241C"
+                          Opacity="0.04" />
+
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="16,9" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Chrome"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chrome" Property="Opacity" Value="0.93" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Chrome" Property="Opacity" Value="0.84" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Chrome" Property="Opacity" Value="0.45" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+            <Setter Property="Background" Value="{StaticResource CardBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Chrome"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource HoverBrush}" />
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource PrimarySoftBorderBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource SelectionBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Chrome" Property="Opacity" Value="0.45" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SectionCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource CardBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Effect" Value="{StaticResource CardShadowEffect}" />
+        </Style>
+
+        <Style x:Key="MetricCardStyle" TargetType="Border" BasedOn="{StaticResource SectionCardStyle}">
+            <Setter Property="Padding" Value="12" />
+        </Style>
+
+        <Style x:Key="TabItemStyle" TargetType="TabItem">
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="MinWidth" Value="64" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="Padding" Value="12,7" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="Chrome"
+                                MinWidth="{TemplateBinding MinWidth}"
+                                Padding="{TemplateBinding Padding}"
+                                Background="{StaticResource SoftCardBrush}"
+                                BorderBrush="Transparent"
+                                BorderThickness="1"
+                                CornerRadius="8">
+                            <ContentPresenter ContentSource="Header"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              RecognizesAccessKey="True" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource PrimarySoftBorderBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource CardBrush}" />
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource PrimarySoftBorderBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SearchInputStyle" TargetType="TextBox">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="ExpanderStyle" TargetType="ToggleButton">
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Width" Value="24" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Path x:Name="Chevron"
+                              Data="M 7 5 L 14 12 L 7 19"
+                              Stroke="{StaticResource WeakTextBrush}"
+                              StrokeThickness="1.9"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"
+                              StrokeLineJoin="Round">
+                            <Path.RenderTransform>
+                                <RotateTransform Angle="0" CenterX="10.5" CenterY="12" />
+                            </Path.RenderTransform>
+                        </Path>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Chevron" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <RotateTransform Angle="90" CenterX="10.5" CenterY="12" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chevron" Property="Stroke" Value="{StaticResource TextBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TreeItemStyle" TargetType="TreeViewItem">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TreeViewItem">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <ToggleButton x:Name="Expander"
+                                          Grid.Row="0"
+                                          Grid.Column="0"
+                                          Margin="0,10,8,0"
+                                          VerticalAlignment="Top"
+                                          IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Style="{StaticResource ExpanderStyle}" />
+                            <ContentPresenter Grid.Row="0" Grid.Column="1" ContentSource="Header" />
+                            <ItemsPresenter x:Name="ItemsHost"
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            Margin="18,0,0,0" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <DataTrigger Binding="{Binding CanExpand}" Value="False">
+                                <Setter TargetName="Expander" Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                            <Trigger Property="IsExpanded" Value="False">
+                                <Setter TargetName="ItemsHost" Property="Visibility" Value="Collapsed" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TableRowBorderStyle" TargetType="Border">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{StaticResource TableDividerBrush}" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="Padding" Value="10,12" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=TreeViewItem}}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource SelectionBrush}" />
+                    <Setter Property="BorderBrush" Value="{StaticResource SelectionBorderBrush}" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="CornerRadius" Value="10" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=TreeViewItem}}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource HoverBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="UsageRowBorderStyle" TargetType="Border">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{StaticResource TableDividerBrush}" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="Padding" Value="8,8,8,10" />
+        </Style>
+
+        <Style x:Key="GroupRowBorderStyle" TargetType="Border" BasedOn="{StaticResource SectionCardStyle}">
+            <Setter Property="Background" Value="{StaticResource SoftCardBrush}" />
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+        </Style>
+
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:FontNodeViewModel}" ItemsSource="{Binding Children}">
+            <Border Style="{StaticResource TableRowBorderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="FontNameCol" Width="*" />
+                        <ColumnDefinition SharedSizeGroup="FontUsesCol" Width="Auto" />
+                        <ColumnDefinition SharedSizeGroup="FontStatusCol" Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel VerticalAlignment="Center">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Grid.Row" Value="0" />
+                                <Setter Property="Grid.Column" Value="0" />
+                                <Setter Property="Grid.ColumnSpan" Value="1" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsNarrowTableLayout}" Value="True">
+                                        <Setter Property="Grid.ColumnSpan" Value="3" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="{Binding FontName}"
+                                   Foreground="{StaticResource TextBrush}"
+                                   FontSize="12.5"
+                                   FontWeight="SemiBold"
+                                   TextWrapping="Wrap"
+                                   TextTrimming="CharacterEllipsis" />
+
+                        <WrapPanel Margin="0,4,0,0">
+                            <TextBlock Text="{Binding SourceText}"
+                                       FontSize="10.5"
+                                       FontWeight="SemiBold">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Item.IsThemeFont}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource GoldBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Item.IsLocallyMissing}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+
+                            <TextBlock Margin="8,0,0,0"
+                                       Text="{Binding StatusText}"
+                                       Visibility="{Binding HasStatus, Converter={StaticResource BoolToVis}}"
+                                       FontSize="10.5"
+                                       FontWeight="SemiBold"
+                                       ToolTip="{Binding StatusToolTip}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource GoldBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Item.IsSubstituted}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </WrapPanel>
+                    </StackPanel>
+
+                    <StackPanel HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Grid.Row" Value="0" />
+                                <Setter Property="Grid.Column" Value="1" />
+                                <Setter Property="Margin" Value="12,0,0,0" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsNarrowTableLayout}" Value="True">
+                                        <Setter Property="Grid.Row" Value="1" />
+                                        <Setter Property="Grid.Column" Value="0" />
+                                        <Setter Property="HorizontalAlignment" Value="Left" />
+                                        <Setter Property="Margin" Value="0,10,12,0" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="Uses"
+                                   Foreground="{StaticResource WeakTextBrush}"
+                                   FontSize="9.5"
+                                   FontWeight="SemiBold"
+                                   Visibility="Collapsed">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsNarrowTableLayout}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock Text="{Binding UsesText}"
+                                   Foreground="{StaticResource TextBrush}"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" />
+                    </StackPanel>
+
+                    <TextBlock Text="{Binding EmbeddingText}"
+                               VerticalAlignment="Center"
+                               FontSize="10.5"
+                               FontWeight="SemiBold">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Grid.Row" Value="0" />
+                                <Setter Property="Grid.Column" Value="2" />
+                                <Setter Property="Grid.ColumnSpan" Value="1" />
+                                <Setter Property="Margin" Value="12,0,0,0" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Item.EmbeddingStatus}" Value="{x:Static models:FontEmbeddingStatus.Yes}">
+                                        <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Item.EmbeddingStatus}" Value="{x:Static models:FontEmbeddingStatus.Subset}">
+                                        <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Item.EmbeddingStatus}" Value="{x:Static models:FontEmbeddingStatus.No}">
+                                        <Setter Property="Foreground" Value="{StaticResource GoldBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Item.IsThemeFont}" Value="True">
+                                        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsNarrowTableLayout}" Value="True">
+                                        <Setter Property="Grid.Row" Value="1" />
+                                        <Setter Property="Grid.Column" Value="1" />
+                                        <Setter Property="Grid.ColumnSpan" Value="2" />
+                                        <Setter Property="HorizontalAlignment" Value="Left" />
+                                        <Setter Property="Margin" Value="0,8,0,0" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+
+                <Border.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Show in PowerPoint" Click="ShowInPowerPoint_Click" />
+                        <MenuItem Header="Replace Font" Click="ReplaceFonts_Click" />
+                    </ContextMenu>
+                </Border.ContextMenu>
+            </Border>
+        </HierarchicalDataTemplate>
+
+        <DataTemplate DataType="{x:Type viewModels:FontUsageNodeViewModel}">
+            <Border Style="{StaticResource UsageRowBorderStyle}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="FontNameCol" Width="*" />
+                        <ColumnDefinition SharedSizeGroup="FontUsesCol" Width="Auto" />
+                        <ColumnDefinition SharedSizeGroup="FontStatusCol" Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.ColumnSpan="3"
+                               Text="{Binding DisplayName}"
+                               Foreground="{StaticResource MutedBrush}"
+                               FontSize="11.5"
+                               TextWrapping="Wrap" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:ColorGroupNodeViewModel}" ItemsSource="{Binding Children}">
+            <Border Style="{StaticResource GroupRowBorderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="ColorSourceCol" Width="*" />
+                        <ColumnDefinition SharedSizeGroup="ColorUsesCol" Width="Auto" />
+                        <ColumnDefinition SharedSizeGroup="ColorThemeCol" Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding DisplayName}"
+                               Foreground="{StaticResource TextBrush}"
+                               FontSize="12.5"
+                               FontWeight="SemiBold"
+                               TextWrapping="Wrap">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Grid.Row" Value="0" />
+                                <Setter Property="Grid.Column" Value="0" />
+                                <Setter Property="Grid.ColumnSpan" Value="1" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsNarrowTableLayout}" Value="True">
+                                        <Setter Property="Grid.ColumnSpan" Value="3" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock Text="{Binding UsesText}"
+                               Foreground="{StaticResource TextBrush}"
+                               FontSize="12.5"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Grid.Row" Value="0" />
+                                <Setter Property="Grid.Column" Value="1" />
+                                <Setter Property="Margin" Value="12,0,0,0" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsNarrowTableLayout}" Value="True">
+                                        <Setter Property="Grid.Column" Value="2" />
+                                        <Setter Property="Margin" Value="12,0,0,0" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock Text="{Binding ColorCountText}"
+                               Foreground="{StaticResource MutedBrush}"
+                               FontSize="11.5"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Grid.Row" Value="0" />
+                                <Setter Property="Grid.Column" Value="2" />
+                                <Setter Property="Margin" Value="12,0,0,0" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsNarrowTableLayout}" Value="True">
+                                        <Setter Property="Grid.Row" Value="1" />
+                                        <Setter Property="Grid.Column" Value="0" />
+                                        <Setter Property="Grid.ColumnSpan" Value="3" />
+                                        <Setter Property="Margin" Value="0,8,0,0" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+            </Border>
+        </HierarchicalDataTemplate>
+
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:ColorNodeViewModel}" ItemsSource="{Binding Children}">
+            <Border Style="{StaticResource TableRowBorderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="ColorSourceCol" Width="*" />
+                        <ColumnDefinition SharedSizeGroup="ColorUsesCol" Width="Auto" />
+                        <ColumnDefinition SharedSizeGroup="ColorThemeCol" Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Grid.Row" Value="0" />
+                                <Setter Property="Grid.Column" Value="0" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsNarrowTableLayout}" Value="True">
+                                        <Setter Property="Grid.ColumnSpan" Value="2" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <Border Width="18"
+                                Height="18"
+                                Margin="0,0,10,0"
+                                Background="{Binding Item.BrushValue}"
+                                BorderBrush="#B5A99A"
+                                BorderThickness="1"
+                                CornerRadius="5" />
+                        <StackPanel>
+                            <TextBlock Text="{Binding HexText}"
+                                       Foreground="{StaticResource TextBrush}"
+                                       FontSize="12.5"
+                                       FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding Item.RgbValue}"
+                                       Foreground="{StaticResource MutedBrush}"
+                                       FontSize="11" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Grid.Row" Value="0" />
+                                <Setter Property="Grid.Column" Value="1" />
+                                <Setter Property="Margin" Value="12,0,0,0" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsNarrowTableLayout}" Value="True">
+                                        <Setter Property="Grid.Column" Value="2" />
+                                        <Setter Property="Margin" Value="12,0,0,0" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="Uses"
+                                   Foreground="{StaticResource WeakTextBrush}"
+                                   FontSize="9.5"
+                                   FontWeight="SemiBold"
+                                   Visibility="Collapsed">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsNarrowTableLayout}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock Text="{Binding UsesText}"
+                                   Foreground="{StaticResource TextBrush}"
+                                   FontSize="12.5"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" />
+                    </StackPanel>
+
+                    <TextBlock Text="{Binding ThemeMatchText}"
+                               VerticalAlignment="Center"
+                               FontSize="11"
+                               FontWeight="SemiBold">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Grid.Row" Value="0" />
+                                <Setter Property="Grid.Column" Value="2" />
+                                <Setter Property="Margin" Value="12,0,0,0" />
+                                <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasThemeMatch}" Value="True">
+                                        <Setter Property="Foreground" Value="{StaticResource GoldBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsNarrowTableLayout}" Value="True">
+                                        <Setter Property="Grid.Row" Value="1" />
+                                        <Setter Property="Grid.Column" Value="0" />
+                                        <Setter Property="Grid.ColumnSpan" Value="3" />
+                                        <Setter Property="Margin" Value="0,8,0,0" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+
+                <Border.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Show in PowerPoint" Click="ShowInPowerPoint_Click" />
+                        <MenuItem Header="Replace Colors" Click="ReplaceColorNode_Click" />
+                    </ContextMenu>
+                </Border.ContextMenu>
+            </Border>
+        </HierarchicalDataTemplate>
+
+        <DataTemplate DataType="{x:Type viewModels:ColorUsageNodeViewModel}">
+            <Border Style="{StaticResource UsageRowBorderStyle}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="ColorSourceCol" Width="*" />
+                        <ColumnDefinition SharedSizeGroup="ColorUsesCol" Width="Auto" />
+                        <ColumnDefinition SharedSizeGroup="ColorThemeCol" Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.ColumnSpan="3"
+                               Text="{Binding DisplayName}"
+                               Foreground="{StaticResource MutedBrush}"
+                               FontSize="11.5"
+                               TextWrapping="Wrap" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <ScrollViewer x:Name="RootScrollViewer"
+                  VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  CanContentScroll="False">
+        <Border Padding="8"
+                Background="{StaticResource PageBackgroundBrush}"
+                MinWidth="250"
+                MinHeight="300"
+                SnapsToDevicePixels="True">
+            <Border Padding="10"
+                    Background="{StaticResource ShellBrush}"
+                    BorderBrush="{StaticResource ShellBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="18"
+                    Effect="{StaticResource ShellShadowEffect}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Border Padding="14"
+                            Background="{StaticResource CardBrush}"
+                            BorderBrush="{StaticResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="12">
+                        <Grid x:Name="HeaderLayoutGrid">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Morphos"
+                                           Foreground="{StaticResource TextBrush}"
+                                           FontSize="21"
+                                           FontWeight="SemiBold" />
+                                <TextBlock Margin="0,8,0,0"
+                                           Text="{Binding StatusText}"
+                                           Foreground="{StaticResource TextBrush}"
+                                           FontSize="12.5"
+                                           FontWeight="SemiBold"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Margin="0,6,0,0"
+                                           Foreground="{StaticResource MutedBrush}"
+                                           FontSize="11"
+                                           TextWrapping="Wrap">
+                                    <Run Text="{Binding TotalFonts}" />
+                                    <Run Text=" fonts" />
+                                    <Run Text="  |  " />
+                                    <Run Text="{Binding TotalDirectColors}" />
+                                    <Run Text=" colors" />
+                                    <Run Text="  |  " />
+                                    <Run Text="{Binding FontWarnings}" />
+                                    <Run Text=" warnings" />
+                                </TextBlock>
+                                <ProgressBar Margin="0,10,0,0"
+                                             Height="4"
+                                             Maximum="100"
+                                             Value="{Binding ProgressValue}"
+                                             Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}" />
+                            </StackPanel>
+                            <WrapPanel x:Name="HeaderActionsPanel"
+                                       Grid.Column="1"
+                                       HorizontalAlignment="Right">
+                                <Button x:Name="RefreshButton"
+                                        MinWidth="92"
+                                        Content="Refresh"
+                                        Click="Refresh_Click"
+                                        Style="{StaticResource PrimaryButtonStyle}" />
+                            </WrapPanel>
+                        </Grid>
+                    </Border>
+
+                    <TabControl x:Name="MainTabControl"
+                                Grid.Row="1"
+                                Margin="0,12,0,0"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                SelectedIndex="2"
+                                SelectionChanged="MainTabControl_SelectionChanged">
+                    <TabControl.Resources>
+                        <Style TargetType="TabItem" BasedOn="{StaticResource TabItemStyle}" />
+                    </TabControl.Resources>
+                    <TabItem x:Name="FontsTab" Header="Fonts">
+                        <Grid x:Name="FontsWorkspaceGrid" Margin="0,14,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition x:Name="FontsExplorerColumn" Width="*" />
+                                <ColumnDefinition x:Name="FontsWorkspaceGapColumn" Width="0" />
+                                <ColumnDefinition x:Name="FontsDetailColumn" Width="0" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border x:Name="FontsExplorerPanel"
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Padding="14"
+                                    Style="{StaticResource SectionCardStyle}"
+                                    Grid.IsSharedSizeScope="True">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel>
+                                            <TextBlock Text="Font inventory"
+                                                       Foreground="{StaticResource TextBrush}"
+                                                       FontSize="14"
+                                                       FontWeight="SemiBold" />
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Column="1"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{StaticResource MutedBrush}"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold">
+                                            <Run Text="{Binding TotalUses}" />
+                                            <Run Text=" uses" />
+                                        </TextBlock>
+                                    </Grid>
+
+                                    <WrapPanel Grid.Row="1" Margin="0,10,0,0">
+                                        <TextBlock Foreground="{StaticResource MutedBrush}"
+                                                   FontSize="11">
+                                            <Run Text="{Binding TotalFonts}" />
+                                            <Run Text=" families" />
+                                        </TextBlock>
+                                        <TextBlock Margin="10,0,0,0"
+                                                   Foreground="{StaticResource GoldBrush}"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold">
+                                            <Run Text="{Binding FontWarnings}" />
+                                            <Run Text=" warnings" />
+                                        </TextBlock>
+                                        <TextBlock Margin="10,0,0,0"
+                                                   Foreground="{StaticResource MutedBrush}"
+                                                   FontSize="11"
+                                                   Text="{Binding EmbeddingSummary}" />
+                                    </WrapPanel>
+
+                                    <Border Grid.Row="2"
+                                            Margin="0,4,0,10"
+                                            Background="White"
+                                            BorderBrush="{StaticResource LineBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="10"
+                                            Padding="12,8">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Viewbox Width="12" Height="12" VerticalAlignment="Center">
+                                                <Canvas Width="12" Height="12">
+                                                    <Ellipse Width="7"
+                                                             Height="7"
+                                                             Canvas.Left="1"
+                                                             Canvas.Top="1"
+                                                             Stroke="{StaticResource MutedBrush}"
+                                                             StrokeThickness="1.3" />
+                                                    <Line X1="7.5"
+                                                          Y1="7.5"
+                                                          X2="11"
+                                                          Y2="11"
+                                                          Stroke="{StaticResource MutedBrush}"
+                                                          StrokeThickness="1.3"
+                                                          StrokeStartLineCap="Round"
+                                                          StrokeEndLineCap="Round" />
+                                                </Canvas>
+                                            </Viewbox>
+
+                                            <TextBox Grid.Column="1"
+                                                     Margin="8,0,0,0"
+                                                     Text="{Binding FontSearchText, UpdateSourceTrigger=PropertyChanged}"
+                                                     ToolTip="Filter by font family or slide instance."
+                                                     Style="{StaticResource SearchInputStyle}" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border x:Name="FontTableHeaderRow"
+                                            Grid.Row="3"
+                                            BorderBrush="{StaticResource TableDividerBrush}"
+                                            BorderThickness="0,0,0,1"
+                                            Padding="10,0,10,10">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition SharedSizeGroup="FontNameCol" Width="*" />
+                                                <ColumnDefinition SharedSizeGroup="FontUsesCol" Width="Auto" />
+                                                <ColumnDefinition SharedSizeGroup="FontStatusCol" Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="Family"
+                                                       Foreground="{StaticResource MutedBrush}"
+                                                       FontSize="10.5"
+                                                       FontWeight="SemiBold" />
+                                            <TextBlock Grid.Column="1"
+                                                       HorizontalAlignment="Center"
+                                                       Text="Uses"
+                                                       Foreground="{StaticResource MutedBrush}"
+                                                       FontSize="10.5"
+                                                       FontWeight="SemiBold" />
+                                            <TextBlock Grid.Column="2"
+                                                       HorizontalAlignment="Center"
+                                                       Text="Embed / status"
+                                                       Foreground="{StaticResource MutedBrush}"
+                                                       FontSize="10.5"
+                                                       FontWeight="SemiBold" />
+                                        </Grid>
+                                    </Border>
+
+                                    <TreeView Grid.Row="4"
+                                              ItemsSource="{Binding RootNodes}"
+                                              Background="Transparent"
+                                              BorderThickness="0"
+                                              SelectedItemChanged="FontTree_SelectedItemChanged"
+                                              VirtualizingStackPanel.IsVirtualizing="True"
+                                              VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                              VirtualizingPanel.CacheLength="2"
+                                              VirtualizingPanel.CacheLengthUnit="Page"
+                                              VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                                              VirtualizingPanel.ScrollUnit="Pixel"
+                                              ScrollViewer.CanContentScroll="True"
+                                              ScrollViewer.IsDeferredScrollingEnabled="True"
+                                              ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                        <TreeView.ItemContainerStyle>
+                                            <Style TargetType="TreeViewItem" BasedOn="{StaticResource TreeItemStyle}" />
+                                        </TreeView.ItemContainerStyle>
+                                    </TreeView>
+                                </Grid>
+                            </Border>
+
+                            <Border x:Name="FontsDetailPanel"
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Margin="0,12,0,0"
+                                    Padding="14"
+                                    Style="{StaticResource SectionCardStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Details"
+                                               Foreground="{StaticResource MutedBrush}"
+                                               FontSize="10.5"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock Margin="0,6,0,0"
+                                               Text="{Binding InspectorTitle}"
+                                               Foreground="{StaticResource TextBrush}"
+                                               FontSize="15"
+                                               FontWeight="SemiBold"
+                                               TextWrapping="Wrap" />
+                                    <Border Margin="0,12,0,0"
+                                            Padding="12"
+                                            Background="{StaticResource SoftCardBrush}"
+                                            BorderBrush="{StaticResource LineBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="12">
+                                        <TextBlock Text="{Binding InspectorBody}"
+                                                   Foreground="{StaticResource TextBrush}"
+                                                   FontSize="11.5"
+                                                   TextWrapping="Wrap" />
+                                    </Border>
+
+                                    <WrapPanel Margin="0,12,0,0">
+                                        <Button Content="Show in PowerPoint"
+                                                Margin="0,0,8,8"
+                                                Click="ShowSelected_Click"
+                                                Style="{StaticResource ActionButtonStyle}"
+                                                IsEnabled="{Binding HasSelectedNode}" />
+                                        <Button Margin="0,0,0,8"
+                                                Content="Replace font"
+                                                Click="ReplaceSelected_Click"
+                                                Style="{StaticResource ActionButtonStyle}"
+                                                IsEnabled="{Binding HasSelectedFont}" />
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem x:Name="ColorsTab" Header="Colors">
+                        <Grid x:Name="ColorsWorkspaceGrid" Margin="0,14,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition x:Name="ColorsExplorerColumn" Width="*" />
+                                <ColumnDefinition x:Name="ColorsWorkspaceGapColumn" Width="0" />
+                                <ColumnDefinition x:Name="ColorsDetailColumn" Width="0" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border x:Name="ColorsExplorerPanel"
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Padding="14"
+                                    Style="{StaticResource SectionCardStyle}"
+                                    Grid.IsSharedSizeScope="True">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel>
+                                            <TextBlock Text="Color inventory"
+                                                       Foreground="{StaticResource TextBrush}"
+                                                       FontSize="14"
+                                                       FontWeight="SemiBold" />
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Column="1"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{StaticResource MutedBrush}"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold">
+                                            <Run Text="{Binding TotalColorUses}" />
+                                            <Run Text=" uses" />
+                                        </TextBlock>
+                                    </Grid>
+
+                                    <WrapPanel Grid.Row="1" Margin="0,10,0,0">
+                                        <TextBlock Foreground="{StaticResource MutedBrush}"
+                                                   FontSize="11">
+                                            <Run Text="{Binding TotalDirectColors}" />
+                                            <Run Text=" colors" />
+                                        </TextBlock>
+                                        <TextBlock Margin="10,0,0,0"
+                                                   Foreground="{StaticResource GoldBrush}"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold">
+                                            <Run Text="{Binding ThemeMatchColors}" />
+                                            <Run Text=" theme matches" />
+                                        </TextBlock>
+                                        <TextBlock Margin="10,0,0,0"
+                                                   Foreground="{StaticResource MutedBrush}"
+                                                   FontSize="11"
+                                                   Text="Direct RGB only" />
+                                    </WrapPanel>
+
+                                    <Border Grid.Row="2"
+                                            Margin="0,4,0,10"
+                                            Background="White"
+                                            BorderBrush="{StaticResource LineBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="10"
+                                            Padding="12,8">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Viewbox Width="12" Height="12" VerticalAlignment="Center">
+                                                <Canvas Width="12" Height="12">
+                                                    <Ellipse Width="7"
+                                                             Height="7"
+                                                             Canvas.Left="1"
+                                                             Canvas.Top="1"
+                                                             Stroke="{StaticResource MutedBrush}"
+                                                             StrokeThickness="1.3" />
+                                                    <Line X1="7.5"
+                                                          Y1="7.5"
+                                                          X2="11"
+                                                          Y2="11"
+                                                          Stroke="{StaticResource MutedBrush}"
+                                                          StrokeThickness="1.3"
+                                                          StrokeStartLineCap="Round"
+                                                          StrokeEndLineCap="Round" />
+                                                </Canvas>
+                                            </Viewbox>
+
+                                            <TextBox Grid.Column="1"
+                                                     Margin="8,0,0,0"
+                                                     Text="{Binding ColorSearchText, UpdateSourceTrigger=PropertyChanged}"
+                                                     ToolTip="Search by hex, RGB value, theme label, or slide instance."
+                                                     Style="{StaticResource SearchInputStyle}" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border x:Name="ColorTableHeaderRow"
+                                            Grid.Row="3"
+                                            BorderBrush="{StaticResource TableDividerBrush}"
+                                            BorderThickness="0,0,0,1"
+                                            Padding="10,0,10,10">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition SharedSizeGroup="ColorSourceCol" Width="*" />
+                                                <ColumnDefinition SharedSizeGroup="ColorUsesCol" Width="Auto" />
+                                                <ColumnDefinition SharedSizeGroup="ColorThemeCol" Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="Color"
+                                                       Foreground="{StaticResource MutedBrush}"
+                                                       FontSize="10.5"
+                                                       FontWeight="SemiBold" />
+                                            <TextBlock Grid.Column="1"
+                                                       HorizontalAlignment="Center"
+                                                       Text="Uses"
+                                                       Foreground="{StaticResource MutedBrush}"
+                                                       FontSize="10.5"
+                                                       FontWeight="SemiBold" />
+                                            <TextBlock Grid.Column="2"
+                                                       Text="Theme / label"
+                                                       Foreground="{StaticResource MutedBrush}"
+                                                       FontSize="10.5"
+                                                       FontWeight="SemiBold" />
+                                        </Grid>
+                                    </Border>
+
+                                    <TreeView Grid.Row="4"
+                                              ItemsSource="{Binding ColorGroups}"
+                                              Background="Transparent"
+                                              BorderThickness="0"
+                                              SelectedItemChanged="FontTree_SelectedItemChanged"
+                                              VirtualizingStackPanel.IsVirtualizing="True"
+                                              VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                              VirtualizingPanel.CacheLength="2"
+                                              VirtualizingPanel.CacheLengthUnit="Page"
+                                              VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                                              VirtualizingPanel.ScrollUnit="Pixel"
+                                              ScrollViewer.CanContentScroll="True"
+                                              ScrollViewer.IsDeferredScrollingEnabled="True"
+                                              ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                        <TreeView.ItemContainerStyle>
+                                            <Style TargetType="TreeViewItem" BasedOn="{StaticResource TreeItemStyle}" />
+                                        </TreeView.ItemContainerStyle>
+                                    </TreeView>
+                                </Grid>
+                            </Border>
+
+                            <Border x:Name="ColorsDetailPanel"
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Margin="0,12,0,0"
+                                    Padding="14"
+                                    Style="{StaticResource SectionCardStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Details"
+                                               Foreground="{StaticResource MutedBrush}"
+                                               FontSize="10.5"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock Margin="0,6,0,0"
+                                               Text="{Binding InspectorTitle}"
+                                               Foreground="{StaticResource TextBrush}"
+                                               FontSize="15"
+                                               FontWeight="SemiBold"
+                                               TextWrapping="Wrap" />
+                                    <Border Margin="0,12,0,0"
+                                            Padding="12"
+                                            Background="{StaticResource SoftCardBrush}"
+                                            BorderBrush="{StaticResource LineBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="12">
+                                        <TextBlock Text="{Binding InspectorBody}"
+                                                   Foreground="{StaticResource TextBrush}"
+                                                   FontSize="11.5"
+                                                   TextWrapping="Wrap" />
+                                    </Border>
+
+                                    <WrapPanel Margin="0,12,0,0">
+                                        <Button Content="Show in PowerPoint"
+                                                Margin="0,0,8,8"
+                                                Click="ShowSelected_Click"
+                                                Style="{StaticResource ActionButtonStyle}"
+                                                IsEnabled="{Binding HasSelectedNode}" />
+                                        <Button Margin="0,0,0,8"
+                                                Content="Replace color"
+                                                Click="ReplaceSelectedColor_Click"
+                                                Style="{StaticResource ActionButtonStyle}"
+                                                IsEnabled="{Binding HasSelectedColor}" />
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem x:Name="HomeTab" Header="Home">
+                        <ScrollViewer Margin="0,14,0,0"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel>
+                                <Border Padding="16"
+                                        Style="{StaticResource SectionCardStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Overview"
+                                                   Foreground="{StaticResource TextBrush}"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold" />
+                                        <TextBlock Margin="0,10,0,0"
+                                                   Text="{Binding StatusText}"
+                                                   Foreground="{StaticResource TextBrush}"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   TextWrapping="Wrap" />
+                                        <TextBlock Margin="0,6,0,0"
+                                                   Foreground="{StaticResource MutedBrush}"
+                                                   FontSize="11"
+                                                   TextWrapping="Wrap">
+                                            <Run Text="{Binding TotalFonts}" />
+                                            <Run Text=" fonts" />
+                                            <Run Text="  |  " />
+                                            <Run Text="{Binding TotalUses}" />
+                                            <Run Text=" uses" />
+                                            <Run Text="  |  " />
+                                            <Run Text="{Binding TotalDirectColors}" />
+                                            <Run Text=" colors" />
+                                        </TextBlock>
+                                        <ProgressBar Margin="0,10,0,0"
+                                                     Height="5"
+                                                     Maximum="100"
+                                                     Value="{Binding ProgressValue}"
+                                                     Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}" />
+                                        <WrapPanel Margin="0,12,0,0">
+                                            <Button Content="Open fonts"
+                                                    Margin="0,0,8,8"
+                                                    Click="GoToFontsTab_Click"
+                                                    Style="{StaticResource ActionButtonStyle}" />
+                                            <Button Content="Open colors"
+                                                    Margin="0,0,8,8"
+                                                    Click="GoToColorsTab_Click"
+                                                    Style="{StaticResource ActionButtonStyle}" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Margin="0,12,0,0"
+                                        Padding="14"
+                                        Style="{StaticResource SectionCardStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Fonts"
+                                                   Foreground="{StaticResource TextBrush}"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold" />
+                                        <primitives:UniformGrid x:Name="HomeFontsMetricsGrid" Margin="0,12,0,0" Columns="2">
+                                            <Border Margin="0,0,8,8"
+                                                    Padding="12,10"
+                                                    Background="{StaticResource SoftCardBrush}"
+                                                    BorderBrush="{StaticResource LineBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="12">
+                                                <StackPanel>
+                                                    <TextBlock Text="Families"
+                                                               Foreground="{StaticResource MutedBrush}"
+                                                               FontSize="10.5" />
+                                                    <TextBlock Margin="0,4,0,0"
+                                                               Text="{Binding TotalFonts}"
+                                                               Foreground="{StaticResource TextBrush}"
+                                                               FontSize="16"
+                                                               FontWeight="Bold" />
+                                                </StackPanel>
+                                            </Border>
+                                            <Border Margin="0,0,0,8"
+                                                    Padding="12,10"
+                                                    Background="{StaticResource GoldSoftBrush}"
+                                                    BorderBrush="{StaticResource GoldBorderBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="12">
+                                                <StackPanel>
+                                                    <TextBlock Text="Warnings"
+                                                               Foreground="{StaticResource GoldBrush}"
+                                                               FontSize="10.5" />
+                                                    <TextBlock Margin="0,4,0,0"
+                                                               Text="{Binding FontWarnings}"
+                                                               Foreground="{StaticResource TextBrush}"
+                                                               FontSize="16"
+                                                               FontWeight="Bold" />
+                                                </StackPanel>
+                                            </Border>
+                                            <Border Margin="0,0,8,0"
+                                                    Padding="12,10"
+                                                    Background="{StaticResource SoftCardBrush}"
+                                                    BorderBrush="{StaticResource LineBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="12">
+                                                <StackPanel>
+                                                    <TextBlock Text="Embed"
+                                                               Foreground="{StaticResource MutedBrush}"
+                                                               FontSize="10.5" />
+                                                    <TextBlock Margin="0,4,0,0"
+                                                               Text="{Binding EmbeddingSummary}"
+                                                               Foreground="{StaticResource TextBrush}"
+                                                               FontSize="16"
+                                                               FontWeight="Bold"
+                                                               TextWrapping="Wrap" />
+                                                </StackPanel>
+                                            </Border>
+                                            <Border Padding="12,10"
+                                                    Background="{StaticResource SoftCardBrush}"
+                                                    BorderBrush="{StaticResource LineBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="12">
+                                                <StackPanel>
+                                                    <TextBlock Text="Substituted / Save"
+                                                               Foreground="{StaticResource MutedBrush}"
+                                                               FontSize="10.5" />
+                                                    <TextBlock Margin="0,4,0,0"
+                                                               Foreground="{StaticResource TextBrush}"
+                                                               FontSize="16"
+                                                               FontWeight="Bold">
+                                                        <Run Text="{Binding SubstitutedFonts}" />
+                                                        <Run Text=" / " />
+                                                        <Run Text="{Binding SaveWarningFonts}" />
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </Border>
+                                        </primitives:UniformGrid>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Margin="0,12,0,0"
+                                        Padding="14"
+                                        Style="{StaticResource SectionCardStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Colors"
+                                                   Foreground="{StaticResource TextBrush}"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold" />
+                                        <primitives:UniformGrid x:Name="HomeColorsMetricsGrid" Margin="0,12,0,0" Columns="2">
+                                            <Border Margin="0,0,8,8"
+                                                    Padding="12,10"
+                                                    Background="{StaticResource SoftCardBrush}"
+                                                    BorderBrush="{StaticResource LineBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="12">
+                                                <StackPanel>
+                                                    <TextBlock Text="Direct colors"
+                                                               Foreground="{StaticResource MutedBrush}"
+                                                               FontSize="10.5" />
+                                                    <TextBlock Margin="0,4,0,0"
+                                                               Text="{Binding TotalDirectColors}"
+                                                               Foreground="{StaticResource TextBrush}"
+                                                               FontSize="16"
+                                                               FontWeight="Bold" />
+                                                </StackPanel>
+                                            </Border>
+                                            <Border Margin="0,0,0,8"
+                                                    Padding="12,10"
+                                                    Background="{StaticResource SoftCardBrush}"
+                                                    BorderBrush="{StaticResource LineBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="12">
+                                                <StackPanel>
+                                                    <TextBlock Text="Uses"
+                                                               Foreground="{StaticResource MutedBrush}"
+                                                               FontSize="10.5" />
+                                                    <TextBlock Margin="0,4,0,0"
+                                                               Text="{Binding TotalColorUses}"
+                                                               Foreground="{StaticResource TextBrush}"
+                                                               FontSize="16"
+                                                               FontWeight="Bold" />
+                                                </StackPanel>
+                                            </Border>
+                                            <Border Margin="0,0,8,0"
+                                                    Padding="12,10"
+                                                    Background="{StaticResource SoftCardBrush}"
+                                                    BorderBrush="{StaticResource LineBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="12">
+                                                <StackPanel>
+                                                    <TextBlock Text="Theme matches"
+                                                               Foreground="{StaticResource MutedBrush}"
+                                                               FontSize="10.5" />
+                                                    <TextBlock Margin="0,4,0,0"
+                                                               Text="{Binding ThemeMatchColors}"
+                                                               Foreground="{StaticResource TextBrush}"
+                                                               FontSize="16"
+                                                               FontWeight="Bold" />
+                                                </StackPanel>
+                                            </Border>
+                                        </primitives:UniformGrid>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+                    </TabControl>
+                </Grid>
+            </Border>
+        </Border>
+    </ScrollViewer>
+</UserControl>

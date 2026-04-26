@@ -1,0 +1,15 @@
+bin/
+obj/
+.vs/
+TestResults/
+publish/
+
+build_log.txt
+tests/__pycache__/
+*.pyc
+
+*.user
+*.suo
+*.cache
+*.tmp
+*.log

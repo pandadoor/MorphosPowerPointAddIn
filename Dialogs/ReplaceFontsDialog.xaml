@@ -1,0 +1,242 @@
+<Window x:Class="MorphosPowerPointAddIn.Dialogs.ReplaceFontsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Replace Font"
+        WindowStartupLocation="CenterOwner"
+        Width="600"
+        Height="430"
+        MinWidth="360"
+        MinHeight="360"
+        ResizeMode="CanResize"
+        Background="#F5F3EE"
+        SizeChanged="Window_SizeChanged"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True">
+    <Window.Resources>
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFDF9" />
+        <SolidColorBrush x:Key="MutedSurfaceBrush" Color="#F6F2EA" />
+        <SolidColorBrush x:Key="HoverBrush" Color="#F1ECE3" />
+        <SolidColorBrush x:Key="SelectedBrush" Color="#ECE6DB" />
+        <SolidColorBrush x:Key="LineBrush" Color="#D7D0C4" />
+        <SolidColorBrush x:Key="StrongTextBrush" Color="#151411" />
+        <SolidColorBrush x:Key="MutedTextBrush" Color="#6B6458" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#1D6A58" />
+        <SolidColorBrush x:Key="AccentSoftBrush" Color="#E5EFEB" />
+
+        <Style x:Key="PanelTitleStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource StrongTextBrush}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="12.5" />
+        </Style>
+
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource StrongTextBrush}" />
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Chrome"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource HoverBrush}" />
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#CFC7B9" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource SelectedBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Chrome" Property="Opacity" Value="0.45" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PrimaryActionButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="{StaticResource StrongTextBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource StrongTextBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Chrome"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="#2A2923" />
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#2A2923" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="#10100D" />
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#10100D" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="10,7" />
+        </Style>
+    </Window.Resources>
+
+    <Border Margin="14"
+            Padding="16"
+            Background="{StaticResource SurfaceBrush}"
+            BorderBrush="{StaticResource LineBrush}"
+            BorderThickness="1"
+            CornerRadius="10">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel>
+                <TextBlock Text="Replace font"
+                           Foreground="{StaticResource StrongTextBrush}"
+                           FontSize="22"
+                           FontWeight="SemiBold" />
+                <TextBlock Margin="0,5,0,0"
+                           Foreground="{StaticResource MutedTextBrush}"
+                           Text="Confirm the selected source family and choose the replacement that should appear throughout the deck."
+                           TextWrapping="Wrap" />
+            </StackPanel>
+
+            <Grid Grid.Row="1" Margin="0,16,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="SelectedFontColumn" Width="*" />
+                    <ColumnDefinition x:Name="FontPanelSpacerColumn" Width="12" />
+                    <ColumnDefinition x:Name="ReplacementFontColumn" Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Border x:Name="SelectedFontPanel"
+                        Padding="14"
+                        Background="{StaticResource MutedSurfaceBrush}"
+                        BorderBrush="{StaticResource LineBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                    <StackPanel>
+                        <TextBlock Text="Selected font" Style="{StaticResource PanelTitleStyle}" />
+                        <TextBlock Margin="0,6,0,0"
+                                   Foreground="{StaticResource MutedTextBrush}"
+                                   Text="This dialog only targets the font you chose from the cleanup list."
+                                   TextWrapping="Wrap" />
+                        <ItemsControl Margin="0,12,0,0"
+                                      ItemsSource="{Binding SelectedSourceFontNames}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,0,0,8"
+                                            Padding="10,8"
+                                            Background="{StaticResource SurfaceBrush}"
+                                            BorderBrush="{StaticResource LineBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="6">
+                                        <TextBlock Text="{Binding}"
+                                                   Foreground="{StaticResource StrongTextBrush}"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   TextWrapping="Wrap" />
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <Border x:Name="ReplacementFontPanel"
+                        Grid.Column="2"
+                        Padding="14"
+                        Background="{StaticResource MutedSurfaceBrush}"
+                        BorderBrush="{StaticResource LineBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Replace with" Style="{StaticResource PanelTitleStyle}" />
+                        <ComboBox Grid.Row="1"
+                                  Margin="0,12,0,0"
+                                  IsTextSearchEnabled="True"
+                                  MaxDropDownHeight="320"
+                                  ItemsSource="{Binding FontChoices}"
+                                  DisplayMemberPath="DisplayName"
+                                  SelectedItem="{Binding SelectedFontChoice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <Border Grid.Row="2"
+                                Margin="0,12,0,0"
+                                Padding="12"
+                                Background="{StaticResource AccentSoftBrush}"
+                                BorderBrush="#CFE2DB"
+                                BorderThickness="1"
+                                CornerRadius="6">
+                            <StackPanel>
+                                <TextBlock Text="Preview"
+                                           Foreground="{StaticResource AccentBrush}"
+                                           FontWeight="SemiBold" />
+                                <TextBlock Margin="0,4,0,0"
+                                           Foreground="{StaticResource MutedTextBrush}"
+                                           TextWrapping="Wrap">
+                                    <Run Text="{Binding SelectedSourceSummary, Mode=OneWay}" />
+                                    <Run Text=" -> " />
+                                    <Run Text="{Binding SelectedFontDisplayName, Mode=OneWay}" />
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Grid.Row="3"
+                                   Margin="0,12,0,0"
+                                   Foreground="{StaticResource MutedTextBrush}"
+                                   Text="Installed Windows fonts and active theme fonts are available here."
+                                   TextWrapping="Wrap" />
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <WrapPanel Grid.Row="2" HorizontalAlignment="Right">
+                <Button Content="Cancel"
+                        Margin="0,0,8,8"
+                        MinWidth="96"
+                        Style="{StaticResource ActionButtonStyle}"
+                        Click="Cancel_Click" />
+                <Button Content="Replace"
+                        Margin="0,0,0,8"
+                        MinWidth="96"
+                        Style="{StaticResource PrimaryActionButtonStyle}"
+                        Click="Replace_Click" />
+            </WrapPanel>
+        </Grid>
+    </Border>
+</Window>

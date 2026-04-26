@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <ProjectGuid>{09ACCAC5-B16B-4636-B9B0-237AB49C6AE6}</ProjectGuid>
+    <ProjectTypeGuids>{60DC8134-EBA5-43B8-BCC9-BB4BC16C2548};{BAA0C2D2-18E2-41B9-852F-F413020CAA33};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>MorphosPowerPointAddIn</RootNamespace>
+    <AssemblyName>MorphosPowerPointAddIn</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetOfficeVersion>16.0</TargetOfficeVersion>
+    <DefineConstants>VSTO40</DefineConstants>
+    <OfficeApplication>PowerPoint</OfficeApplication>
+    <SignAssembly>false</SignAssembly>
+    <SignManifests>true</SignManifests>
+    <ManifestCertificateThumbprint>CA243DB0126FF148049F40FDBBA1C793524AB856</ManifestCertificateThumbprint>
+    <GenerateManifests>true</GenerateManifests>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>false</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ProductName>MorphosPowerPointAddIn</ProductName>
+    <PublisherName>Contoso</PublisherName>
+    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationVersion>1.0.0.0</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <TrustUrlParameters>true</TrustUrlParameters>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">17.0</VisualStudioVersion>
+    <VSTOPath Condition="'$(VSTOPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSTOPath>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;VSTO40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <RegisterForComInterop>false</RegisterForComInterop>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE;VSTO40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <RegisterForComInterop>false</RegisterForComInterop>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DocumentFormat.OpenXml">
+      <HintPath>$(PkgDocumentFormat_OpenXml)\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml.Framework">
+      <HintPath>$(PkgDocumentFormat_OpenXml_Framework)\lib\net46\DocumentFormat.OpenXml.Framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Office.Interop.PowerPoint">
+      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\Visual Studio Tools for Office\PIA\Office15\Microsoft.Office.Interop.PowerPoint.dll</HintPath>
+      <Private>False</Private>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="office">
+      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio\Shared\Visual Studio Tools for Office\PIA\Office15\Office.dll</HintPath>
+      <Private>False</Private>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools">
+      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Common.v4.0.Utilities">
+      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.Common.v4.0.Utilities.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Common">
+      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.v4.0.Framework">
+      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.v4.0.Framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Tools.Applications.Runtime">
+      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.VisualStudio.Tools.Applications.Runtime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Tools.Applications.Hosting">
+      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.VisualStudio.Tools.Applications.Hosting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.0.2" GeneratePathProperty="true" />
+    <PackageReference Include="DocumentFormat.OpenXml.Framework" Version="3.0.2" GeneratePathProperty="true" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ThisAddIn.cs" />
+    <Compile Include="ThisAddIn.Designer.cs">
+      <DependentUpon>ThisAddIn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ribbon\MorphosRibbon.cs" />
+    <Compile Include="Models\FontEmbeddingStatus.cs" />
+    <Compile Include="Models\ColorInventoryItem.cs" />
+    <Compile Include="Models\ColorReplacementInstruction.cs" />
+    <Compile Include="Models\ColorReplacementSummary.cs" />
+    <Compile Include="Models\ColorScanResult.cs" />
+    <Compile Include="Models\ColorUsageKind.cs" />
+    <Compile Include="Models\FontInventoryItem.cs" />
+    <Compile Include="Models\FontReplacementTarget.cs" />
+    <Compile Include="Models\FontReplacementResult.cs" />
+    <Compile Include="Models\FontUsageLocation.cs" />
+    <Compile Include="Models\PackageFontUsageRecord.cs" />
+    <Compile Include="Models\PresentationScope.cs" />
+    <Compile Include="Models\PresentationScanResult.cs" />
+    <Compile Include="Models\ScanProgressInfo.cs" />
+    <Compile Include="Models\ThemeColorInfo.cs" />
+    <Compile Include="Services\OpenXmlColorReplacer.cs" />
+    <Compile Include="Services\OpenXmlFontReplacer.cs" />
+    <Compile Include="Services\OpenXmlScanService.cs" />
+    <Compile Include="Services\FontScanSessionCache.cs" />
+    <Compile Include="Services\PowerPointPresentationService.cs" />
+    <Compile Include="Utilities\AhoCorasickMatcher.cs" />
+    <Compile Include="Utilities\ComFontAccessorCache.cs" />
+    <Compile Include="Utilities\DialogWindowHelper.cs" />
+    <Compile Include="Utilities\ErrorReporter.cs" />
+    <Compile Include="Utilities\FontTrie.cs" />
+    <Compile Include="Utilities\FontNameNormalizer.cs" />
+    <Compile Include="Utilities\FontPaneSelectionResolver.cs" />
+    <Compile Include="Utilities\FontReplacementStrategy.cs" />
+    <Compile Include="Utilities\FontReplacementTargetBuilder.cs" />
+    <Compile Include="Utilities\FontSearchIndex.cs" />
+    <Compile Include="Utilities\OfficeBusyMessageFilter.cs" />
+    <Compile Include="Utilities\PresentationColorInspector.cs" />
+    <Compile Include="Utilities\PresentationPackageInspector.cs" />
+    <Compile Include="Utilities\RangeObservableCollection.cs" />
+    <Compile Include="Utilities\SystemFontRegistry.cs" />
+    <Compile Include="ViewModels\BindableBase.cs" />
+    <Compile Include="ViewModels\ColorGroupNodeViewModel.cs" />
+    <Compile Include="ViewModels\ColorNodeViewModel.cs" />
+    <Compile Include="ViewModels\ColorUsageNodeViewModel.cs" />
+    <Compile Include="ViewModels\FontNodeViewModel.cs" />
+    <Compile Include="ViewModels\FontRootNodeViewModel.cs" />
+    <Compile Include="ViewModels\FontUsageNodeViewModel.cs" />
+    <Compile Include="ViewModels\FontsPaneViewModel.cs" />
+    <Compile Include="ViewModels\TreeNodeViewModel.cs" />
+    <Compile Include="UI\FontsTaskPaneHost.cs" />
+    <Compile Include="UI\FontsUserControl.xaml.cs">
+      <DependentUpon>FontsUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ReplaceFontsDialog.xaml.cs">
+      <DependentUpon>ReplaceFontsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ReplaceColorsDialog.xaml.cs">
+      <DependentUpon>ReplaceColorsDialog.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="UI\FontsUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\ReplaceFontsDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\ReplaceColorsDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ThisAddIn.Designer.xml">
+      <DependentUpon>ThisAddIn.cs</DependentUpon>
+    </None>
+    <None Include="Properties\PublishProfiles\ClickOnceProduction.pubxml" />
+    <Content Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.8">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.8 (x86 and x64)</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.VSTORuntime.4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft Visual Studio Tools for Office Runtime</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSTOPath)\OfficeTools\Microsoft.VisualStudio.Tools.Office.targets" Condition="Exists('$(VSTOPath)\OfficeTools\Microsoft.VisualStudio.Tools.Office.targets')" />
+</Project>
