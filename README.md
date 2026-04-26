@@ -1,135 +1,92 @@
+<p align="center">
+  <img src="docs/assets/morphos-banner.png" alt="Morphos Banner" width="100%">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Windows-blue.svg" alt="Platform">
+  <img src="https://img.shields.io/badge/License-MIT-gold.svg" alt="License">
+  <img src="https://img.shields.io/badge/Build-VSTO-brown.svg" alt="Build">
+  <img src="https://img.shields.io/badge/PowerPoint-2016+-orange.svg" alt="PowerPoint">
+</p>
+
+---
+
 # Morphos
 
-PowerPoint cleanup, without leaving PowerPoint.
+### PowerPoint cleanup, without leaving PowerPoint.
 
-![Morphos mark](docs/assets/morphos-mark.svg)
+**Morphos** is a professional-grade Windows VSTO add-in for Microsoft PowerPoint designed to streamline the deck cleanup process. It scans your active presentation, identifies critical font and color inconsistencies, and provides a focused workspace to repair them—all from a compact, responsive task pane.
 
-![Morphos task pane](docs/assets/morphos-task-pane-home.png)
+## ✨ Why Morphos?
 
-Morphos is a Windows VSTO add-in for Microsoft PowerPoint that scans the active deck, highlights the font and color issues worth fixing, and lets you repair them from a compact task pane. It is built for real cleanup work: missing fonts, inconsistent replacements, slow rescans, and the friction of jumping between slide fixes and file-level fixes.
+PowerPoint cleanup is traditionally a fragmented process involving multiple dialogs and manual slide inspection. Morphos consolidates this workflow into four intuitive steps:
+1.  **Scan**: Automatically audit your deck's internal structure.
+2.  **Inspect**: Visualize hidden issues like missing fonts or non-theme colors.
+3.  **Replace**: Execute precise, bulk repairs safely.
+4.  **Verify**: Confirm your deck is professional and consistent.
 
-## What Morphos does
+---
 
-- Scans the active presentation automatically when a deck opens or the Morphos pane becomes active.
-- Shows a minimal Home tab with the deck signals that matter first.
-- Audits fonts with usage counts, installation state, embedding state, and slide-level drilldown.
-- Replaces fonts safely from installed Windows fonts and active theme font tokens.
-- Audits direct RGB color usage and replaces colors from a purpose-built dialog.
-- Jumps back into PowerPoint context from the task pane so cleanup stays grounded in the deck.
-- Uses caching and Open XML fast paths to keep repeated scans and large-deck operations responsive.
+## 🚀 Key Capabilities
 
-## Why it exists
+### 🔎 Intelligent Font Inventory
+*   **Audit**: View usage counts, installation status, and embedding states.
+*   **Drilldown**: Jump directly to specific slides containing the target font.
+*   **Safe Replacement**: Validate replacement targets against real system fonts and active theme tokens.
 
-PowerPoint cleanup is usually scattered across dialogs, manual slide inspection, and trial-and-error replacement. Morphos pulls that work into one focused workspace:
+### 🎨 Precise Color Management
+*   **Inventory**: Group direct RGB color usage into actionable cleanup tables.
+*   **Theme Alignment**: Identify colors that *should* be theme-linked and convert them in bulk.
+*   **Visual Context**: Navigate slide-by-slide to see exactly where colors are being used.
 
-- scan
-- inspect
-- replace
-- verify
+### ⚡ Optimized for Performance
+*   **Open XML Speed**: Uses low-level package scanning to avoid COM-heavy overhead on large decks.
+*   **Smart Caching**: Reuses presentation snapshots (`FontScanSessionCache`) to keep repeated scans lightning-fast.
+*   **Robust Interop**: Built-in retry helpers and busy-state filters to ensure stability during intensive PowerPoint operations.
 
-The recent hardening work in this repo also addresses the failure modes that usually make Office add-ins feel unreliable:
+---
 
-- stale replace targets
-- missing auto-scan on open
-- task-pane recovery after mutations
-- slow repeated rescans
+## 🛠 Architecture at a Glance
 
-## Key capabilities
+Morphos is built with a clean, layered architecture that separates Office interop from business logic and UI:
 
-### Home
+- **Core Hosting**: `ThisAddIn.cs` manages the lifecycle and task-pane integration.
+- **Service Layer**: `PowerPointPresentationService.cs` orchestrates scans and mutations.
+- **Fast Paths**: `OpenXml*.cs` provides direct package inspection for high-volume decks.
+- **Modern UI**: WPF-based task pane with responsive layouts and MVVM state management.
 
-The Home tab is intentionally quiet. It surfaces the presentation name, deck-level counts, missing font pressure, embedding state, and quick actions into Fonts or Colors without forcing users through dense copy first.
+---
 
-### Fonts
+## 🏁 Quick Start
 
-The Fonts tab is designed for cleanup work:
-
-- compact inventory rows
-- responsive drilldown panel
-- usage navigation back into PowerPoint
-- font replacement that now validates against real installed targets before the dialog is shown
-
-### Colors
-
-The Colors tab groups direct RGB usage into a cleanup-friendly table and keeps replacement actions close to the affected color groups instead of spreading them across separate workflows.
-
-## Architecture at a glance
-
-Morphos uses a layered structure that keeps Office interop, package inspection, and WPF UI responsibilities separate:
-
-- `ThisAddIn.cs`: PowerPoint host lifecycle, task-pane management, warm refresh scheduling, auto-scan triggers
-- `Ribbon/`: PowerPoint ribbon entry point
-- `UI/` and `Dialogs/`: WPF task pane and replace dialogs
-- `ViewModels/`: task-pane state, node trees, async refresh/replace flows
-- `Services/PowerPointPresentationService.cs`: presentation scanning, replacement orchestration, validation, mutation handling
-- `Services/OpenXml*.cs`: fast package scan and package mutation paths
-- `Services/FontScanSessionCache.cs`: presentation-scoped cache for scan results and replacement targets
-- `Utilities/`: PowerPoint interop helpers, font registry lookup, selection resolution, retry/filter helpers
-
-## Performance and reliability notes
-
-Morphos is optimized around the pain points of real PowerPoint cleanup:
-
-- Open XML package scanning reduces repeated COM-heavy work.
-- `FontScanSessionCache` reuses presentation snapshots when the deck has not materially changed.
-- `ComFontAccessorCache` cuts repeated COM property lookup overhead.
-- Retry helpers smooth over transient Office busy/rejected-call behavior.
-- Replacement target cache versioning prevents stale or impossible font choices from surviving into the live dialog.
-
-## Verification used for this repo
-
-These checks were run against the local add-in build and live PowerPoint automation:
-
-| Check | Purpose |
-| --- | --- |
-| `.\build-and-run.ps1` | Rebuild, reapply the local manifest, restore `LoadBehavior=3`, verify the COM add-in is connected |
-| `.\tests\Verify-FontReplacementTargets.ps1` | Confirms replacement targets include valid scanned fonts and theme tokens |
-| `.\tests\Verify-MissingFontReplacementTargets.ps1` | Confirms missing non-installed fonts are not surfaced as replacement targets |
-| `.\tests\Verify-StaleFontReplacementTargetCache.ps1` | Confirms stale cached invalid targets are rebuilt before the dialog uses them |
-| `.\tests\Verify-PowerPointInteractiveReplace.ps1` | Confirms task-pane auto-scan and live replace dialogs open inside PowerPoint |
-| `.\tests\Verify-ServiceFontReplace.ps1` | Confirms live font replacement works on a PowerPoint presentation copy |
-
-## Quick start
-
-### 1. Clone the repo
-
+### 1. Clone the Repository
 ```powershell
 git clone https://github.com/pandadoor/MorphosPowerPointAddIn.git
 cd MorphosPowerPointAddIn
 ```
 
-### 2. Build, register, and load Morphos
-
+### 2. Build and Install
+Run the automation script to handle everything from compilation to registry registration:
 ```powershell
 .\build-and-run.ps1
 ```
+*The script rebuilds the add-in, configures the local VSTO manifest, and launches PowerPoint automatically.*
 
-The script rebuilds the add-in, rewrites the local VSTO manifest registration, restores `LoadBehavior=3`, starts PowerPoint, and verifies that `MorphosPowerPointAddIn` is connected.
+### 3. Open the Inspector
+1.  Open any PowerPoint presentation.
+2.  Navigate to the **Morphos** tab on the Ribbon.
+3.  Click **Open Inspector** to begin your scan.
 
-### 3. Open the pane in PowerPoint
+---
 
-In PowerPoint:
+## 📄 Licensing & Documentation
 
-1. Open a presentation.
-2. Open the `Morphos` ribbon tab.
-3. Click `Open Inspector`.
+*   **License**: This project is licensed under the [MIT License](LICENSE).
+*   **Setup Guide**: See [docs/INSTALLATION.md](docs/INSTALLATION.md) for environment requirements.
+*   **Developer Notes**: See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for build and testing details.
 
-## Installation and development
+---
 
-- Local setup and troubleshooting: [docs/INSTALLATION.md](docs/INSTALLATION.md)
-- Build, test, and architecture notes: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)
-
-## Platform scope
-
-Morphos currently targets:
-
-- Windows
-- Microsoft PowerPoint desktop
-- VSTO / .NET Framework 4.8
-- x64 builds
-
-It is not intended for PowerPoint for the web or macOS.
-
-## License
-
-MIT. See [LICENSE](LICENSE).
+<p align="center">
+  <i>Built for precision. Designed for efficiency.</i>
+</p>

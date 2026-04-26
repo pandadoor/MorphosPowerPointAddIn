@@ -210,7 +210,7 @@ namespace MorphosPowerPointAddIn.UI
             var isCompact = width > 0 && width < CompactPaneWidthThreshold;
             IsNarrowTableLayout = width > 0 && width < CompactTableWidthThreshold;
             var useSplitWorkspace = width >= WorkspaceSplitWidthThreshold;
-            var showGraphics = width <= 0 || width >= GraphicVisibilityWidthThreshold;
+            var showGraphics = width > 0 && width >= GraphicVisibilityWidthThreshold;
 
             if (FontTableHeaderRow != null)
             {
