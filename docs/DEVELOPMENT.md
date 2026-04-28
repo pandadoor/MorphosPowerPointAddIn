@@ -41,6 +41,7 @@ This document is the practical map for building, testing, and extending the add-
 | `Services/` | Scan, cache, replace, Open XML fallback/fast-path behavior |
 | `Utilities/` | Interop helpers, font lookup, retry helpers, selection helpers |
 | `Models/` | Scan and replacement DTOs |
+| `packaging/` | Enterprise installer scripts, WiX source, and build automation |
 | `tests/` | PowerShell and Python verification harnesses |
 
 ## Architecture notes

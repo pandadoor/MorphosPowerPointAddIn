@@ -1,6 +1,16 @@
-# Installing Morphos
+This guide covers how to install Morphos, either from a pre-built release or from source.
 
-This guide covers local installation from source for the PowerPoint add-in in this repository.
+## Enterprise Release Installation (Recommended)
+
+For most users, installing from a pre-built release is the most efficient method.
+
+1.  Download the latest `Morphos_vX.X.X.zip` from the [Releases](https://github.com/pandadoor/MorphosPowerPointAddIn/releases) page.
+2.  Extract the contents to a local folder.
+3.  Right-click `install.ps1` and select **Run with PowerShell**.
+    *   To install for all users, run from an elevated (Administrator) PowerShell prompt: `.\install.ps1 -AllUsers`
+4.  Launch PowerPoint and locate the **Morphos** tab.
+
+## Local Source Installation
 
 ## Requirements
 
