@@ -79,22 +79,47 @@ The system utilizes a decoupled, service-oriented architecture to ensure thread 
 
 ---
 
-## Deployment
+## Deployment and Installation
 
-### System Requirements
+Morphos supports multiple deployment models for enterprise environments, including per-user local installation and per-machine administrative deployment.
 
-| Component | Specification |
+### Enterprise Installation
+
+The distribution package includes a robust PowerShell-based installer (`install.ps1`) that manages dependency verification, file staging, and registry registration.
+
+| Feature | Description |
 | :--- | :--- |
-| Operating System | Windows 10 / 11 (x64) |
-| Host Application | Microsoft PowerPoint 2016 or higher / Microsoft 365 |
-| Runtime Environment | .NET Framework 4.8 |
+| **Silent Installation** | Deploy without user interaction using the `-Silent` flag. |
+| **Per-Machine Scope** | Register the add-in for all users on a device using the `-AllUsers` flag (requires elevation). |
+| **Dependency Validation** | Automatically verifies the presence of .NET Framework 4.8 and the VSTO Runtime. |
+| **Automated Verification** | Includes a post-install validation suite to ensure operational readiness. |
 
-### Installation
+#### Installation Commands
 
 ```powershell
-# Execute the automated build and deployment sequence
-.\build-and-run.ps1
+# Standard per-user installation
+.\packaging\install.ps1
+
+# Administrative per-machine silent installation
+.\packaging\install.ps1 -AllUsers -Silent
 ```
+
+### Automated Verification
+
+To confirm the integrity of a deployment, execute the verification script. This validates the registry state, manifest paths, and resource availability.
+
+```powershell
+.\packaging\verify-install.ps1 -Mode HKCU  # For per-user
+.\packaging\verify-install.ps1 -Mode HKLM  # For per-machine
+```
+
+### MSI Packaging (WiX Toolset)
+
+For organizations requiring standard MSI packages, a WiX Toolset configuration is provided in `packaging/Morphos.wxs`. This source file can be compiled into a signed MSI using `candle.exe` and `light.exe`.
+
+#### Packaging Requirements
+*   **WiX Toolset v3.11+**
+*   **Code Signing Certificate**: Use `signtool.exe` to sign the resulting MSI or self-extracting EXE for trusted deployment.
 
 ---
 

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="*" Name="Morphos PowerPoint Add-In" Language="1033" Version="1.0.0.0" Manufacturer="Contoso" UpgradeCode="78A5C1B2-D4A1-4F9B-B1C2-D4A14F9B1C2D">
+        <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+        <MediaTemplate EmbedCab="yes" />
+
+        <Feature Id="ProductFeature" Title="Morphos Add-In" Level="1">
+            <ComponentGroupRef Id="ProductComponents" />
+            <ComponentGroupRef Id="RegistryComponents" />
+        </Feature>
+
+        <Property Id="VSTORUNTIME">
+            <RegistrySearch Id="VSTORuntimeSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VSTO Runtime Setup\v4R" Name="Version" Type="raw" />
+        </Property>
+
+        <Condition Message="This add-in requires the Visual Studio Tools for Office Runtime. Please install it.">
+            <![CDATA[Installed OR VSTORUNTIME]]>
+        </Condition>
+    </Product>
+
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFiles64Folder">
+                <Directory Id="INSTALLFOLDER" Name="Morphos" />
+            </Directory>
+        </Directory>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component Id="MainDll" Guid="*">
+                <File Id="MorphosDll" Source="staging\MorphosPowerPointAddIn.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="MainManifest" Guid="*">
+                <File Id="MorphosManifest" Source="staging\MorphosPowerPointAddIn.dll.manifest" />
+            </Component>
+            <Component Id="VstoManifest" Guid="*">
+                <File Id="MorphosVsto" Source="staging\MorphosPowerPointAddIn.vsto" />
+            </Component>
+            <Component Id="OpenXmlDll" Guid="*">
+                <File Id="OpenXml" Source="staging\DocumentFormat.OpenXml.dll" />
+            </Component>
+            <Component Id="OpenXmlFrameworkDll" Guid="*">
+                <File Id="OpenXmlFramework" Source="staging\DocumentFormat.OpenXml.Framework.dll" />
+            </Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="RegistryComponents" Directory="TARGETDIR">
+            <Component Id="RegistryEntries" Guid="A1B2C3D4-E5F6-4A1B-2C3D-4E5F6A1B2C3D">
+                <RegistryKey Root="HKLM" Key="Software\Microsoft\Office\PowerPoint\Addins\MorphosPowerPointAddIn">
+                    <RegistryValue Type="string" Name="FriendlyName" Value="Morphos" />
+                    <RegistryValue Type="string" Name="Description" Value="Morphos PowerPoint cleanup workspace" />
+                    <RegistryValue Type="string" Name="Manifest" Value="[INSTALLFOLDER]MorphosPowerPointAddIn.vsto|vstolocal" />
+                    <RegistryValue Type="integer" Name="LoadBehavior" Value="3" />
+                </RegistryKey>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

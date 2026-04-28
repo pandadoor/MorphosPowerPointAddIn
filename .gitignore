@@ -1,17 +1,44 @@
-bin/
-obj/
+## Visual Studio
 .vs/
-TestResults/
-publish/
-
-build_log.txt
-tests/__pycache__/
-*.pyc
-
+[Bb]in/
+[Oo]bj/
+[Tt]est[Rr]esults/
 *.user
 *.suo
 *.cache
 *.tmp
 *.log
-*.ps1
-*.txt
+*.opendb
+*.VC.db
+*.sln.docstates
+*.userosscache
+
+## NuGet
+packages/
+*.nuget.props
+*.nuget.targets
+
+## Morphos Build Artifacts
+build_log.txt
+build_errors.txt
+rebuild_errors.txt
+publish/
+
+## Packaging
+packaging/staging/
+packaging/*.exe
+packaging/*.msi
+
+## Python (Legacy/Test)
+__pycache__/
+*.pyc
+
+## Sensitive Files
+*.pfx
+*.snk
+# *.cer is public and typically committed, but exclude if preferred
+# *.cer
+
+## Miscellaneous
+.DS_Store
+Thumbs.db
