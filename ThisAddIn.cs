@@ -31,6 +31,7 @@ namespace MorphosPowerPointAddIn
         private IntPtr _currentTaskPaneWindowKey = IntPtr.Zero;
         private int _refreshSuppressionCount;
         private int _warmRefreshVersion;
+        private int _windowActivateDebounceVersion;
 
         private void ThisAddIn_Startup(object sender, EventArgs e)
         {
@@ -42,7 +43,6 @@ namespace MorphosPowerPointAddIn
                 this.Application.PresentationOpen += Application_PresentationOpen;
                 this.Application.WindowActivate += Application_WindowActivate;
                 this.Application.PresentationCloseFinal += Application_PresentationCloseFinal;
-                QueueWarmRefresh(true);
             }
             catch (Exception ex)
             {
@@ -107,20 +107,10 @@ namespace MorphosPowerPointAddIn
                 {
                     return _activeRefreshTask;
                 }
-            }
 
-            if (!force && !HasPresentationChanged(activePresentation))
-            {
-                return Task.FromResult(true);
-            }
-
-            lock (_refreshSync)
-            {
-                if (_activeRefreshTask != null
-                    && !_activeRefreshTask.IsCompleted
-                    && string.Equals(_activeRefreshPresentationKey, activePresentationKey, StringComparison.OrdinalIgnoreCase))
+                if (!force && !HasPresentationChanged(activePresentation))
                 {
-                    return _activeRefreshTask;
+                    return Task.FromResult(true);
                 }
 
                 var refreshVersion = ++_activeRefreshVersion;
@@ -339,14 +329,28 @@ namespace MorphosPowerPointAddIn
 
         private void Application_PresentationOpen(Presentation pres)
         {
-            QueueWarmRefresh(true);
             SyncTaskPaneToActiveWindow(false);
+            if (_isTaskPaneRequestedVisible)
+            {
+                QueueWarmRefresh(true);
+            }
         }
 
         private void Application_WindowActivate(Presentation pres, DocumentWindow wn)
         {
             var activatedWindowKey = GetWindowKey(wn);
-            QueueWarmRefresh(false);
+            var debounceVersion = Interlocked.Increment(ref _windowActivateDebounceVersion);
+            _ = HandleWindowActivateAsync(activatedWindowKey, debounceVersion);
+        }
+
+        private async Task HandleWindowActivateAsync(IntPtr activatedWindowKey, int debounceVersion)
+        {
+            await Task.Delay(100).ConfigureAwait(true);
+            if (debounceVersion != Volatile.Read(ref _windowActivateDebounceVersion))
+            {
+                return;
+            }
+
             if (_isTaskPaneRequestedVisible)
             {
                 var forceRefresh = activatedWindowKey != IntPtr.Zero && activatedWindowKey != _currentTaskPaneWindowKey;
@@ -449,19 +453,22 @@ namespace MorphosPowerPointAddIn
         private void RequestPaneRefresh(bool force)
         {
             _ = RefreshAsync(force, false);
-            QueueWarmRefresh(force);
         }
 
         private void QueueWarmRefresh(bool force)
         {
+            if (!_isTaskPaneRequestedVisible && _paneViewModel != null && _paneViewModel.HasCompletedScan)
+            {
+                return;
+            }
+
             var refreshVersion = Interlocked.Increment(ref _warmRefreshVersion);
             _ = WarmRefreshAsync(force, refreshVersion);
         }
 
         private async Task WarmRefreshAsync(bool force, int refreshVersion)
         {
-            var delays = new[] { 0, 150, 400, 900, 1500, 2500, 4000 };
-            var requiresConfirmationPass = false;
+            var delays = new[] { 0, 300, 1200 };
             for (var attempt = 0; attempt < delays.Length; attempt++)
             {
                 if (refreshVersion != Volatile.Read(ref _warmRefreshVersion))
@@ -480,6 +487,11 @@ namespace MorphosPowerPointAddIn
                     return;
                 }
 
+                if (!_isTaskPaneRequestedVisible && _paneViewModel != null && _paneViewModel.HasCompletedScan)
+                {
+                    return;
+                }
+
                 var activePresentation = GetActivePresentation();
                 if (string.IsNullOrWhiteSpace(GetPresentationKey(activePresentation)))
                 {
@@ -487,17 +499,10 @@ namespace MorphosPowerPointAddIn
                 }
 
                 var shouldForceRefresh = force
-                    || requiresConfirmationPass
                     || (attempt == 0 && (!_paneViewModel.HasCompletedScan || !_paneViewModel.LastScanSucceeded || HasPresentationChanged(activePresentation)));
                 var refreshed = await RefreshAsync(shouldForceRefresh, false).ConfigureAwait(true);
                 if (refreshed)
                 {
-                    if (attempt == 0 && shouldForceRefresh && !requiresConfirmationPass)
-                    {
-                        requiresConfirmationPass = true;
-                        continue;
-                    }
-
                     return;
                 }
             }

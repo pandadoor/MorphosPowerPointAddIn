@@ -210,7 +210,6 @@ namespace MorphosPowerPointAddIn.UI
             var isCompact = width > 0 && width < CompactPaneWidthThreshold;
             IsNarrowTableLayout = width > 0 && width < CompactTableWidthThreshold;
             var useSplitWorkspace = width >= WorkspaceSplitWidthThreshold;
-            var showGraphics = width > 0 && width >= GraphicVisibilityWidthThreshold;
 
             if (FontTableHeaderRow != null)
             {
@@ -234,15 +233,7 @@ namespace MorphosPowerPointAddIn.UI
                 ColorsDetailPanel,
                 useSplitWorkspace);
 
-            if (HeaderGraphicShell != null)
-            {
-                HeaderGraphicShell.Visibility = showGraphics ? Visibility.Visible : Visibility.Collapsed;
-            }
 
-            if (HomeGraphicShell != null)
-            {
-                HomeGraphicShell.Visibility = showGraphics ? Visibility.Visible : Visibility.Collapsed;
-            }
 
             if (HeaderActionsPanel == null || HeaderVisualPanel == null)
             {

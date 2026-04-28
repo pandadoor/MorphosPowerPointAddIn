@@ -240,6 +240,7 @@ namespace MorphosPowerPointAddIn.ViewModels
                 if (previousCts != null)
                 {
                     TryCancel(previousCts);
+                    TryDispose(previousCts);
                 }
 
                 await InvokeOnUiAsync(() =>
@@ -251,6 +252,12 @@ namespace MorphosPowerPointAddIn.ViewModels
                 }).ConfigureAwait(false);
 
                 await _scanGate.WaitAsync().ConfigureAwait(false);
+                if (scanVersion != Volatile.Read(ref _scanVersion))
+                {
+                    _scanGate.Release();
+                    TryDispose(nextCts);
+                    return;
+                }
 
                 try
                 {
@@ -353,13 +360,8 @@ namespace MorphosPowerPointAddIn.ViewModels
                 finally
                 {
                     _scanGate.Release();
-
-                    if (ReferenceEquals(_scanCts, nextCts))
-                    {
-                        _scanCts = null;
-                    }
-
-                    nextCts.Dispose();
+                    Interlocked.CompareExchange(ref _scanCts, null, nextCts);
+                    TryDispose(nextCts);
 
                     if (scanVersion == Volatile.Read(ref _scanVersion))
                     {
@@ -742,6 +744,7 @@ namespace MorphosPowerPointAddIn.ViewModels
                 if (previousCts != null)
                 {
                     TryCancel(previousCts);
+                    TryDispose(previousCts);
                 }
 
                 await InvokeOnUiAsync(() =>
@@ -752,6 +755,12 @@ namespace MorphosPowerPointAddIn.ViewModels
                 }).ConfigureAwait(false);
 
                 await _scanGate.WaitAsync().ConfigureAwait(false);
+                if (scanVersion != Volatile.Read(ref _scanVersion))
+                {
+                    _scanGate.Release();
+                    TryDispose(nextCts);
+                    return;
+                }
 
                 try
                 {
@@ -814,13 +823,8 @@ namespace MorphosPowerPointAddIn.ViewModels
                 finally
                 {
                     _scanGate.Release();
-
-                    if (ReferenceEquals(_scanCts, nextCts))
-                    {
-                        _scanCts = null;
-                    }
-
-                    nextCts.Dispose();
+                    Interlocked.CompareExchange(ref _scanCts, null, nextCts);
+                    TryDispose(nextCts);
 
                     if (scanVersion == Volatile.Read(ref _scanVersion))
                     {
@@ -840,6 +844,7 @@ namespace MorphosPowerPointAddIn.ViewModels
                 if (previousCts != null)
                 {
                     TryCancel(previousCts);
+                    TryDispose(previousCts);
                 }
 
                 await InvokeOnUiAsync(() =>
@@ -850,6 +855,12 @@ namespace MorphosPowerPointAddIn.ViewModels
                 }).ConfigureAwait(false);
 
                 await _scanGate.WaitAsync().ConfigureAwait(false);
+                if (scanVersion != Volatile.Read(ref _scanVersion))
+                {
+                    _scanGate.Release();
+                    TryDispose(nextCts);
+                    return;
+                }
 
                 try
                 {
@@ -919,13 +930,8 @@ namespace MorphosPowerPointAddIn.ViewModels
                 finally
                 {
                     _scanGate.Release();
-
-                    if (ReferenceEquals(_scanCts, nextCts))
-                    {
-                        _scanCts = null;
-                    }
-
-                    nextCts.Dispose();
+                    Interlocked.CompareExchange(ref _scanCts, null, nextCts);
+                    TryDispose(nextCts);
 
                     if (scanVersion == Volatile.Read(ref _scanVersion))
                     {
@@ -1546,6 +1552,22 @@ namespace MorphosPowerPointAddIn.ViewModels
             try
             {
                 cancellationTokenSource.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+        }
+
+        private static void TryDispose(CancellationTokenSource cancellationTokenSource)
+        {
+            if (cancellationTokenSource == null)
+            {
+                return;
+            }
+
+            try
+            {
+                cancellationTokenSource.Dispose();
             }
             catch (ObjectDisposedException)
             {

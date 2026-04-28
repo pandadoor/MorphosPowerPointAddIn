@@ -25,6 +25,8 @@ namespace MorphosPowerPointAddIn.Services
         private readonly OpenXmlScanService _openXmlScanService;
         private readonly FontScanSessionCache _fontScanSessionCache;
         private bool _lastMutationReloadedPresentation;
+        private HashSet<string> _cachedInstalledFonts;
+        private DateTime _cachedInstalledFontsTimestamp;
 
         public PowerPointPresentationService(PowerPoint.Application application)
         {
@@ -33,9 +35,22 @@ namespace MorphosPowerPointAddIn.Services
             _openXmlFontReplacer = new OpenXmlFontReplacer();
             _openXmlScanService = new OpenXmlScanService();
             _fontScanSessionCache = new FontScanSessionCache(
-                () => new HashSet<string>(SystemFontRegistry.GetInstalledFontNames(), StringComparer.OrdinalIgnoreCase),
+                () => GetInstalledFontsSet(),
                 CaptureScanSnapshot,
                 RefreshPackageMetadata);
+        }
+
+        private HashSet<string> GetInstalledFontsSet()
+        {
+            var now = DateTime.UtcNow;
+            if (_cachedInstalledFonts != null && (now - _cachedInstalledFontsTimestamp).TotalSeconds < 30)
+            {
+                return _cachedInstalledFonts;
+            }
+
+            _cachedInstalledFonts = new HashSet<string>(SystemFontRegistry.GetInstalledFontNames(), StringComparer.OrdinalIgnoreCase);
+            _cachedInstalledFontsTimestamp = now;
+            return _cachedInstalledFonts;
         }
 
         internal bool LastMutationReloadedPresentation => _lastMutationReloadedPresentation;
@@ -66,7 +81,7 @@ namespace MorphosPowerPointAddIn.Services
                 return new PresentationScanResult();
             }
 
-            var installedFonts = new HashSet<string>(SystemFontRegistry.GetInstalledFontNames(), StringComparer.OrdinalIgnoreCase);
+            var installedFonts = GetInstalledFontsSet();
             var snapshot = _fontScanSessionCache.GetOrCreateSnapshot(presentation);
             var cachedAnalysisResult = TryGetCachedPresentationScanResult(snapshot);
             if (cachedAnalysisResult != null)
@@ -179,7 +194,7 @@ namespace MorphosPowerPointAddIn.Services
                 return Array.Empty<FontInventoryItem>();
             }
 
-            var installedFonts = new HashSet<string>(SystemFontRegistry.GetInstalledFontNames(), StringComparer.OrdinalIgnoreCase);
+            var installedFonts = GetInstalledFontsSet();
             var snapshot = _fontScanSessionCache.GetOrCreateSnapshot(presentation);
             var cachedFontItems = TryGetCachedFontItems(snapshot);
             if (cachedFontItems != null)
@@ -4125,7 +4140,7 @@ namespace MorphosPowerPointAddIn.Services
                 return result;
             }
 
-            var installedFonts = new HashSet<string>(SystemFontRegistry.GetInstalledFontNames(), StringComparer.OrdinalIgnoreCase);
+            var installedFonts = GetInstalledFontsSet();
             var snapshot = _fontScanSessionCache.GetOrCreateSnapshot(presentation);
             IDictionary<string, FontAccumulator> accumulators = null;
             var usedPackageScan = false;
