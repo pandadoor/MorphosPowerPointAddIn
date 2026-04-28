@@ -17,54 +17,79 @@
 
 ---
 
-## Technical Abstract
+## Key Features and Interface
 
-Morphos is a high-performance VSTO (Visual Studio Tools for Office) solution engineered to optimize the presentation refinement lifecycle within Microsoft PowerPoint. It leverages low-level Open XML package inspection and a robust asynchronous processing architecture to provide real-time auditing and bulk remediation of document assets, specifically targeting font and color consistency.
+Morphos provides a sophisticated interface for the comprehensive management of presentation assets.
 
-## Architectural Overview
+### Workspace Dashboard
+The primary dashboard provides a high-level technical summary of the presentation's integrity, including font distribution, color usage metrics, and automated validation warnings.
 
-The system is built upon a decoupled, service-oriented architecture designed to mitigate the inherent latency of COM-based Office interop while maintaining strict thread safety and UI responsiveness.
+![Workspace Dashboard](docs/assets/home.png)
+*Figure 1: Main interface providing a summary of fonts, colors, and real-time scanning status.*
 
-### Core Architecture Layers
+### Font Audit and Bulk Remediation
+Identify all font families within the presentation, including embedded, missing, or substituted resources. Morphos enables the rapid replacement of font families across all document parts to ensure typographic consistency.
 
-*   **Application Lifecycle Management**: The `ThisAddIn` controller orchestrates the integration with the PowerPoint host, managing multi-window task pane synchronization and event-driven state transitions.
-*   **Asynchronous Service Layer**: The `PowerPointPresentationService` handles the heavy lifting of presentation scanning and mutation, utilizing background task scheduling to prevent UI thread blocking.
-*   **Asset Inspection & Mutation**: A hybrid approach combines the **Office Object Model (COM)** for live document interaction and the **Open XML SDK** for high-speed package-level auditing and bulk modifications.
-*   **Presentation State Management**: Implemented via **WPF and the MVVM pattern**, the user interface provides a responsive, state-aware workspace with real-time progress reporting and error handling.
+| Interface Component | Functional Description |
+| :--- | :--- |
+| ![Font Tab](docs/assets/font-tab.png) | **Asset Inventory**: An exhaustive catalog of font families identified within the presentation package. |
+| ![Font Selection](docs/assets/font-select.png) | **Granular Inspection**: Drill-down analysis of specific font instances and their locations. |
+| ![Replace Font](docs/assets/font-replaceFont.png) | **Automated Replacement**: Batch remediation of font families across the entire presentation. |
 
-## System Lifecycle and Integration
+### Color Inventory and Theme Alignment
+Identify RGB colors that deviate from the established corporate theme. Morphos catalogs every unique color instance and provides tools to align them with the official presentation color scheme.
 
-Morphos integrates deeply with the Microsoft PowerPoint application lifecycle through a series of deterministic event handlers:
-
-*   **Initialization**: On startup, the add-in initializes its internal services and registers global application hooks (`PresentationOpen`, `WindowActivate`).
-*   **Dynamic Task Pane Synchronization**: The system monitors window activation states to ensure the Morphos task pane remains synchronized with the active document context, creating or recovering pane instances as required.
-*   **Automated Auditing**: Proactive scanning is triggered by document activation and visibility changes, ensuring the user is always presented with the most current asset inventory.
-
-## Performance Optimization Strategies
-
-To meet the demands of enterprise-scale presentations, Morphos implements several advanced performance optimizations:
-
-*   **Open XML Fast Paths**: Utilizing direct package inspection allows for significantly faster scanning of large presentations compared to traditional COM-based iteration.
-*   **Session-Scoped Caching**: The `FontScanSessionCache` minimizes redundant IO and processing by maintaining snapshots of presentation metadata, which are only invalidated upon material document changes.
-*   **COM Accessor Optimization**: The `ComFontAccessorCache` reduces the overhead of repeated COM property lookups during intensive font audits.
-*   **Retry and Message Filtering**: Implements custom `IOleMessageFilter` logic to gracefully handle Office "Busy" or "Rejected" states, ensuring operational reliability during concurrent PowerPoint activities.
+| Interface Component | Functional Description |
+| :--- | :--- |
+| ![Color Tab](docs/assets/color-tab.png) | **Color Analysis**: A comprehensive inventory of RGB and Theme colors utilized throughout the deck. |
+| ![Color Selection](docs/assets/color-select.png) | **Usage Mapping**: Identification of specific elements utilizing non-theme colors. |
+| ![Replace Color](docs/assets/color-replaceColor.png) | **Theme Integration**: Bulk alignment of custom colors with the presentation's theme palette. |
 
 ---
 
-## Deployment and Configuration
+## Functional Workflow
+
+Morphos utilizes a deterministic three-stage process to ensure presentation compliance and quality:
+
+1.  **Analysis**: Upon document activation, Morphos executes a deep-package scan using the **Open XML SDK**. This methodology bypasses the latency of traditional COM-based iteration by inspecting the underlying XML structure directly.
+2.  **Categorization**: Assets are cataloged and validated against system-level resources (installed fonts) and document-level metadata (theme colors). Discrepancies are flagged for remediation.
+3.  **Remediation**: Users can execute bulk transformations on selected asset groups. These operations are performed as atomic transactions to maintain document integrity while minimizing manual effort.
+
+---
+
+## Technical Abstract
+
+Morphos is a high-performance VSTO solution engineered to optimize the presentation refinement lifecycle. It leverages low-level Open XML package inspection and a robust asynchronous processing architecture to provide real-time auditing and bulk remediation of document assets.
+
+## Architectural Overview
+
+The system utilizes a decoupled, service-oriented architecture to ensure thread safety and UI responsiveness:
+
+*   **Application Lifecycle Management**: The `ThisAddIn` controller manages integration with the PowerPoint host and orchestrates task pane synchronization.
+*   **Asynchronous Service Layer**: The `PowerPointPresentationService` executes scanning and mutation operations via background tasks to prevent UI thread blocking.
+*   **Asset Inspection and Mutation**: A hybrid model utilizing the **Office Object Model (COM)** for live interaction and the **Open XML SDK** for high-performance package-level auditing.
+*   **State Management**: Developed using **WPF and the MVVM pattern**, providing a state-aware workspace with real-time telemetry.
+
+## Performance Optimization
+
+*   **Open XML Integration**: Direct package inspection provides superior performance compared to COM-based iteration for large presentations.
+*   **Session-Scoped Caching**: The system maintains snapshots of presentation metadata to minimize redundant IO and processing.
+*   **Registry TTL Management**: Intelligent caching of system resources reduces allocation overhead during intensive scanning sessions.
+*   **Event Debouncing**: Specialized logic stabilizes UI interactions by managing rapid window activation and change events.
+
+---
+
+## Deployment
 
 ### System Requirements
 
 | Component | Specification |
 | :--- | :--- |
 | Operating System | Windows 10 / 11 (x64) |
-| Host Application | Microsoft PowerPoint 2016, 2019, 2021, or Microsoft 365 |
+| Host Application | Microsoft PowerPoint 2016 or higher / Microsoft 365 |
 | Runtime Environment | .NET Framework 4.8 |
-| Development Framework | VSTO (Visual Studio Tools for Office) |
 
-### Installation Procedure
-
-The project includes a comprehensive PowerShell automation script for end-to-end deployment, covering compilation, manifest generation, and registry configuration:
+### Installation
 
 ```powershell
 # Execute the automated build and deployment sequence
@@ -76,10 +101,8 @@ The project includes a comprehensive PowerShell automation script for end-to-end
 ## Documentation and Compliance
 
 *   **Licensing**: Distributed under the [MIT License](LICENSE).
-*   **Security**: Implements safe mutation patterns with validation layers to prevent document corruption.
+*   **Security**: Implements validated mutation patterns to ensure document integrity and prevent corruption.
 *   **Compliance**: Adheres to Microsoft Office UI Guidelines and Open XML File Format standards.
-
----
 
 <p align="center">
   <em>Optimizing digital communication through engineering excellence.</em>
