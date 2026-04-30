@@ -1130,19 +1130,19 @@ namespace MorphosPowerPointAddIn.Services
         {
             try
             {
-                return Convert.ToString(font.GetType().InvokeMember(propertyName, System.Reflection.BindingFlags.GetProperty, null, font, null));
+                switch (propertyName)
+                {
+                    case "Name": return font.Name;
+                    case "NameAscii": return font.NameAscii;
+                    case "NameFarEast": return font.NameFarEast;
+                    case "NameComplexScript": return font.NameComplexScript;
+                    case "NameOther": return font.NameOther;
+                }
             }
             catch
             {
-                try
-                {
-                    return Convert.ToString(((dynamic)font)[propertyName]);
-                }
-                catch
-                {
-                    return string.Empty;
-                }
             }
+            return string.Empty;
         }
 
         private static void TryAddFont(ISet<string> fonts, string fontName)
@@ -1180,9 +1180,16 @@ namespace MorphosPowerPointAddIn.Services
 
         private IEnumerable<dynamic> EnumerateRuns(dynamic textRange)
         {
+            if (textRange == null)
+            {
+                yield break;
+            }
+
             dynamic runs = null;
             try
             {
+                // In PowerPoint COM, Runs() returns a TextRange that represents the collection of runs.
+                // We attempt to iterate it directly using dynamic which handles the COM enumeration internally.
                 runs = textRange.Runs();
             }
             catch
@@ -1196,25 +1203,14 @@ namespace MorphosPowerPointAddIn.Services
                 yield break;
             }
 
-            int count;
-            try
+            // High-performance COM iteration: foreach on dynamic handles the IEnumVARIANT internally
+            // which is significantly faster than indexed access in PowerPoint.
+            foreach (dynamic run in runs)
             {
-                count = runs.Count;
-            }
-            catch
-            {
-                count = 0;
-            }
-
-            if (count <= 0)
-            {
-                yield return textRange;
-                yield break;
-            }
-
-            for (var i = 1; i <= count; i++)
-            {
-                yield return runs[i];
+                if (run != null)
+                {
+                    yield return run;
+                }
             }
         }
 
@@ -1618,15 +1614,17 @@ namespace MorphosPowerPointAddIn.Services
 
             TryApplyToShapeCollection(presentation.SlideMaster?.Shapes, action);
 
-            foreach (PowerPoint.CustomLayout layout in presentation.SlideMaster.CustomLayouts)
+            var layouts = presentation.SlideMaster.CustomLayouts;
+            for (var i = 1; i <= layouts.Count; i++)
             {
-                TryApplyToShapeCollection(layout.Shapes, action);
+                TryApplyToShapeCollection(layouts[i].Shapes, action);
                 YieldToOffice();
             }
 
-            foreach (PowerPoint.Slide slide in presentation.Slides)
+            var slides = presentation.Slides;
+            for (var i = 1; i <= slides.Count; i++)
             {
-                TryApplyToShapeCollection(slide.Shapes, action);
+                TryApplyToShapeCollection(slides[i].Shapes, action);
                 YieldToOffice();
             }
 
@@ -1860,7 +1858,28 @@ namespace MorphosPowerPointAddIn.Services
 
             try
             {
+                // SURGICAL OPTIMIZATION: Check if the entire range shares a single font.
+                // If textRange.Font.Name is not empty/null, it means the whole range is uniform.
+                // We can replace it in one shot and avoid iterating over individual runs.
                 var font = textRange.Font;
+                string uniformName = null;
+                try { uniformName = font.Name; } catch { }
+
+                if (!string.IsNullOrEmpty(uniformName))
+                {
+                    if (sourceFonts.Contains(FontNameNormalizer.Normalize(uniformName)))
+                    {
+                        font.Name = replacementFont;
+                        // For uniformity, we still apply to sub-properties to be safe, but we've avoided the RUN loop.
+                        font.NameAscii = replacementFont;
+                        font.NameFarEast = replacementFont;
+                        font.NameComplexScript = replacementFont;
+                        font.NameOther = replacementFont;
+                        return; 
+                    }
+                }
+
+                // If not uniform, apply to all sub-properties using the optimized matcher.
                 ReplaceFontProperty(font, "Name", sourceFonts, replacementFont);
                 ReplaceFontProperty(font, "NameAscii", sourceFonts, replacementFont);
                 ReplaceFontProperty(font, "NameFarEast", sourceFonts, replacementFont);
@@ -1881,7 +1900,7 @@ namespace MorphosPowerPointAddIn.Services
             }
         }
 
-        private static void ReplaceFontProperty(object font, string propertyName, ISet<string> sourceFonts, string replacementFont)
+        private static void ReplaceFontProperty(dynamic font, string propertyName, ISet<string> sourceFonts, string replacementFont)
         {
             if (font == null || sourceFonts == null || string.IsNullOrWhiteSpace(propertyName))
             {
@@ -1890,20 +1909,33 @@ namespace MorphosPowerPointAddIn.Services
 
             try
             {
-                string currentValue;
-                if (!ComFontAccessorCache.TryGetString(font, propertyName, out currentValue))
+                string currentValue = null;
+                switch (propertyName)
+                {
+                    case "Name": currentValue = font.Name; break;
+                    case "NameAscii": currentValue = font.NameAscii; break;
+                    case "NameFarEast": currentValue = font.NameFarEast; break;
+                    case "NameComplexScript": currentValue = font.NameComplexScript; break;
+                    case "NameOther": currentValue = font.NameOther; break;
+                    default: return;
+                }
+
+                if (string.IsNullOrWhiteSpace(currentValue))
                 {
                     return;
                 }
 
-                currentValue = FontNameNormalizer.Normalize(currentValue);
-
-                if (!sourceFonts.Contains(currentValue))
+                if (sourceFonts.Contains(FontNameNormalizer.Normalize(currentValue)))
                 {
-                    return;
+                    switch (propertyName)
+                    {
+                        case "Name": font.Name = replacementFont; break;
+                        case "NameAscii": font.NameAscii = replacementFont; break;
+                        case "NameFarEast": font.NameFarEast = replacementFont; break;
+                        case "NameComplexScript": font.NameComplexScript = replacementFont; break;
+                        case "NameOther": font.NameOther = replacementFont; break;
+                    }
                 }
-
-                ComFontAccessorCache.TrySetString(font, propertyName, replacementFont);
             }
             catch
             {

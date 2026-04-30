@@ -1,17 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing.Text;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using System.Windows.Media;
-using Microsoft.Win32;
+using System.Text.RegularExpressions;
 
 namespace MorphosPowerPointAddIn.Utilities
 {
     internal static class SystemFontRegistry
     {
-        private static readonly Regex SuffixPattern = new Regex(@"\s*\(.*\)\s*$", RegexOptions.Compiled);
         private static readonly object SyncRoot = new object();
         private static IReadOnlyCollection<string> _cachedFonts;
 
@@ -26,56 +22,53 @@ namespace MorphosPowerPointAddIn.Utilities
             }
 
             var fonts = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            AddRegistryFonts(Registry.LocalMachine, fonts);
-            AddRegistryFonts(Registry.CurrentUser, fonts);
 
             try
             {
-                using (var installed = new InstalledFontCollection())
-                {
-                    foreach (var family in installed.Families)
-                    {
-                        fonts.Add(family.Name);
-                    }
-                }
-            }
-            catch
-            {
-            }
-
-            try
-            {
+                // Primary source: WPF SystemFontFamilies (Very fast)
                 foreach (var family in Fonts.SystemFontFamilies)
                 {
-                    try
+                    foreach (var name in family.FamilyNames.Values)
                     {
-                        if (!string.IsNullOrWhiteSpace(family.Source))
-                        {
-                            fonts.Add(family.Source.Trim());
-                        }
-
-                        foreach (var localizedName in family.FamilyNames.Values)
-                        {
-                            if (!string.IsNullOrWhiteSpace(localizedName))
-                            {
-                                fonts.Add(localizedName.Trim());
-                            }
-                        }
-
-                        AddTypefaceAliases(family, fonts);
-                    }
-                    catch
-                    {
+                        AddFontName(fonts, name);
                     }
                 }
+
+                // SECONARY SOURCE: Windows Registry (Instant, exactly what Windows/Office uses)
+                // HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts
+                try
+                {
+                    using (var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts"))
+                    {
+                        if (key != null)
+                        {
+                            foreach (var valueName in key.GetValueNames())
+                            {
+                                // Registry values are often "Font Name (TrueType)" or similar.
+                                var name = valueName;
+                                var bracketIndex = name.IndexOf('(');
+                                if (bracketIndex > 0)
+                                {
+                                    name = name.Substring(0, bracketIndex).Trim();
+                                }
+                                AddFontName(fonts, name);
+                            }
+                        }
+                    }
+                }
+                catch { }
+
+                // FALLBACK: DFS scan of C:\Windows\Fonts for unregistered font files.
+                // We only do this for the system fonts folder as requested.
+                // We use a high-performance check to avoid re-parsing known fonts.
+                ScanFontsDirectoryDFS(@"C:\Windows\Fonts", fonts);
             }
             catch
             {
+                // Fail gracefully
             }
 
-            AddShellFontNames(fonts);
-
-            var snapshot = fonts.ToList();
+            var snapshot = fonts.OrderBy(x => x).ToList();
 
             lock (SyncRoot)
             {
@@ -88,210 +81,60 @@ namespace MorphosPowerPointAddIn.Utilities
             }
         }
 
+        private static void ScanFontsDirectoryDFS(string directoryPath, ISet<string> fonts)
+        {
+            try
+            {
+                if (!System.IO.Directory.Exists(directoryPath)) return;
+
+                var files = System.IO.Directory.GetFiles(directoryPath);
+                foreach (var file in files)
+                {
+                    var ext = System.IO.Path.GetExtension(file);
+                    if (string.Equals(ext, ".ttf", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(ext, ".ttc", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(ext, ".otf", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // OPTIMIZATION: Only parse the file if we haven't found many fonts yet
+                        // or if we really need to. Parsing thousands of font files is the cause of UI lag.
+                        if (fonts.Count > 1000) continue; 
+
+                        try
+                        {
+                            foreach (var family in Fonts.GetFontFamilies(new Uri(file, UriKind.Absolute)))
+                            {
+                                foreach (var name in family.FamilyNames.Values)
+                                {
+                                    AddFontName(fonts, name);
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                }
+
+                foreach (var dir in System.IO.Directory.GetDirectories(directoryPath))
+                {
+                    ScanFontsDirectoryDFS(dir, fonts);
+                }
+            }
+            catch { }
+        }
+
         public static bool SystemFontExists(string fontName)
         {
-            var normalized = NormalizeFontName(fontName);
-            if (string.IsNullOrWhiteSpace(normalized))
-            {
-                return false;
-            }
-
-            return GetInstalledFontNames().Contains(normalized, StringComparer.OrdinalIgnoreCase);
-        }
-
-        private static void AddRegistryFonts(RegistryKey root, ISet<string> fonts)
-        {
-            try
-            {
-                using (var key = root.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts"))
-                {
-                    if (key == null)
-                    {
-                        return;
-                    }
-
-                    foreach (var valueName in key.GetValueNames())
-                    {
-                        var normalized = NormalizeRegistryName(valueName);
-                        if (!string.IsNullOrWhiteSpace(normalized))
-                        {
-                            fonts.Add(normalized);
-                        }
-                    }
-                }
-            }
-            catch
-            {
-            }
-        }
-
-        private static void AddTypefaceAliases(FontFamily family, ISet<string> fonts)
-        {
-            if (family == null || fonts == null)
-            {
-                return;
-            }
-
-            foreach (var typeface in family.GetTypefaces())
-            {
-                try
-                {
-                    GlyphTypeface glyphTypeface;
-                    if (!typeface.TryGetGlyphTypeface(out glyphTypeface) || glyphTypeface == null)
-                    {
-                        continue;
-                    }
-
-                    AddFamilyNames(glyphTypeface.FamilyNames, fonts);
-                    AddFamilyNames(glyphTypeface.Win32FamilyNames, fonts);
-
-                    AddCompositeNames(glyphTypeface.FamilyNames, glyphTypeface.FaceNames, fonts);
-                    AddCompositeNames(glyphTypeface.Win32FamilyNames, glyphTypeface.Win32FaceNames, fonts);
-                }
-                catch
-                {
-                }
-            }
-        }
-
-        private static void AddFamilyNames(
-            IDictionary<System.Globalization.CultureInfo, string> names,
-            ISet<string> fonts)
-        {
-            if (names == null || fonts == null)
-            {
-                return;
-            }
-
-            foreach (var familyName in names.Values)
-            {
-                AddFontName(fonts, familyName);
-            }
-        }
-
-        private static void AddCompositeNames(
-            IDictionary<System.Globalization.CultureInfo, string> familyNames,
-            IDictionary<System.Globalization.CultureInfo, string> faceNames,
-            ISet<string> fonts)
-        {
-            if (familyNames == null || faceNames == null || fonts == null)
-            {
-                return;
-            }
-
-            var faceNameList = faceNames.Values
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList();
-
-            foreach (var familyName in familyNames.Values.Where(x => !string.IsNullOrWhiteSpace(x)))
-            {
-                AddFontName(fonts, familyName);
-
-                foreach (var faceName in faceNameList)
-                {
-                    AddFontName(fonts, familyName + " " + faceName);
-                }
-            }
-        }
-
-        private static void AddShellFontNames(ISet<string> fonts)
-        {
-            object shellApplication = null;
-            object shellNamespace = null;
-            object shellItems = null;
-
-            try
-            {
-                var shellType = Type.GetTypeFromProgID("Shell.Application");
-                if (shellType == null)
-                {
-                    return;
-                }
-
-                shellApplication = Activator.CreateInstance(shellType);
-                if (shellApplication == null)
-                {
-                    return;
-                }
-
-                dynamic shell = shellApplication;
-                shellNamespace = shell.Namespace(0x14);
-                if (shellNamespace == null)
-                {
-                    return;
-                }
-
-                dynamic fontNamespace = shellNamespace;
-                shellItems = fontNamespace.Items();
-                if (shellItems == null)
-                {
-                    return;
-                }
-
-                var itemCount = Convert.ToInt32(fontNamespace.Items().Count);
-                for (var index = 0; index < itemCount; index++)
-                {
-                    try
-                    {
-                        dynamic item = fontNamespace.Items().Item(index);
-                        AddFontName(fonts, Convert.ToString(item.Name));
-                        ReleaseComObject(item);
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
-            catch
-            {
-            }
-            finally
-            {
-                ReleaseComObject(shellItems);
-                ReleaseComObject(shellNamespace);
-                ReleaseComObject(shellApplication);
-            }
+            if (string.IsNullOrWhiteSpace(fontName)) return false;
+            return GetInstalledFontNames().Contains(fontName.Trim(), StringComparer.OrdinalIgnoreCase);
         }
 
         private static void AddFontName(ISet<string> fonts, string fontName)
         {
-            var normalized = NormalizeFontName(fontName);
-            if (string.IsNullOrWhiteSpace(normalized))
+            if (string.IsNullOrWhiteSpace(fontName)) return;
+            var trimmed = fontName.Trim();
+            if (trimmed.Length > 0)
             {
-                return;
+                fonts.Add(trimmed);
             }
-
-            fonts.Add(normalized);
-        }
-
-        private static void ReleaseComObject(object value)
-        {
-            if (value != null && Marshal.IsComObject(value))
-            {
-                try
-                {
-                    Marshal.ReleaseComObject(value);
-                }
-                catch
-                {
-                }
-            }
-        }
-
-        private static string NormalizeRegistryName(string valueName)
-        {
-            if (string.IsNullOrWhiteSpace(valueName))
-            {
-                return string.Empty;
-            }
-
-            return SuffixPattern.Replace(valueName, string.Empty).Trim();
-        }
-
-        private static string NormalizeFontName(string fontName)
-        {
-            return string.IsNullOrWhiteSpace(fontName) ? string.Empty : fontName.Trim();
         }
     }
 }

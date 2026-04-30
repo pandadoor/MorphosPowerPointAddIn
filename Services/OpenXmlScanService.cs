@@ -37,36 +37,10 @@ namespace MorphosPowerPointAddIn.Services
         private const string PresentationNamespace = "http://schemas.openxmlformats.org/presentationml/2006/main";
         private const string ChartNamespace = "http://schemas.openxmlformats.org/drawingml/2006/chart";
 
-        private readonly AhoCorasickMatcher<UsageMarker> _usageMatcher;
-        private readonly AhoCorasickMatcher<string> _fontElementMatcher;
+
 
         public OpenXmlScanService()
         {
-            _usageMatcher = new AhoCorasickMatcher<UsageMarker>();
-            foreach (var pattern in new[] { "/ln/", "/uln/", "/lnref/" })
-            {
-                _usageMatcher.Add(pattern, UsageMarker.Line);
-            }
-
-            foreach (var pattern in new[] { "/rpr/", "/defrpr/", "/endpararpr/", "/txpr/", "/txbody/", "/fontref/", "/highlight/" })
-            {
-                _usageMatcher.Add(pattern, UsageMarker.Text);
-            }
-
-            foreach (var pattern in new[] { "/effectlst/", "/effectstyle/", "/outershdw/", "/innershdw/", "/glow/", "/effectref/" })
-            {
-                _usageMatcher.Add(pattern, UsageMarker.Effect);
-            }
-
-            _usageMatcher.Build();
-
-            _fontElementMatcher = new AhoCorasickMatcher<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var elementName in new[] { "latin", "ea", "cs", "sym", "buFont" })
-            {
-                _fontElementMatcher.Add(elementName, elementName);
-            }
-
-            _fontElementMatcher.Build();
         }
 
         public OpenXmlPackageScanResult ScanPackage(
@@ -186,7 +160,7 @@ namespace MorphosPowerPointAddIn.Services
                         }
                         else if (shapeStack.Count > 0
                             && string.Equals(reader.NamespaceURI, DrawingNamespace, StringComparison.Ordinal)
-                            && _fontElementMatcher.Matches(reader.LocalName))
+                            && IsFontElement(reader.LocalName))
                         {
                             var typeface = NormalizeFontName(reader.GetAttribute("typeface"));
                             if (!string.IsNullOrWhiteSpace(typeface))
@@ -463,29 +437,53 @@ namespace MorphosPowerPointAddIn.Services
                 return ColorUsageKind.ShapeFill;
             }
 
-            if (frames.Any(x => x.IsChartElement))
+            bool isChart = false;
+            ColorUsageKind? kind = null;
+
+            foreach (var frame in frames)
+            {
+                if (frame.IsChartElement)
+                {
+                    isChart = true;
+                }
+
+                if (kind == null)
+                {
+                    var name = frame.LocalName;
+                    if (name.Equals("ln", StringComparison.OrdinalIgnoreCase) ||
+                        name.Equals("uln", StringComparison.OrdinalIgnoreCase) ||
+                        name.Equals("lnref", StringComparison.OrdinalIgnoreCase))
+                    {
+                        kind = ColorUsageKind.Line;
+                    }
+                    else if (name.Equals("rpr", StringComparison.OrdinalIgnoreCase) ||
+                             name.Equals("defrpr", StringComparison.OrdinalIgnoreCase) ||
+                             name.Equals("endpararpr", StringComparison.OrdinalIgnoreCase) ||
+                             name.Equals("txpr", StringComparison.OrdinalIgnoreCase) ||
+                             name.Equals("txbody", StringComparison.OrdinalIgnoreCase) ||
+                             name.Equals("fontref", StringComparison.OrdinalIgnoreCase) ||
+                             name.Equals("highlight", StringComparison.OrdinalIgnoreCase))
+                    {
+                        kind = ColorUsageKind.TextFill;
+                    }
+                    else if (name.Equals("effectlst", StringComparison.OrdinalIgnoreCase) ||
+                             name.Equals("effectstyle", StringComparison.OrdinalIgnoreCase) ||
+                             name.Equals("outershdw", StringComparison.OrdinalIgnoreCase) ||
+                             name.Equals("innershdw", StringComparison.OrdinalIgnoreCase) ||
+                             name.Equals("glow", StringComparison.OrdinalIgnoreCase) ||
+                             name.Equals("effectref", StringComparison.OrdinalIgnoreCase))
+                    {
+                        kind = ColorUsageKind.Effect;
+                    }
+                }
+            }
+
+            if (isChart)
             {
                 return ColorUsageKind.ChartOverride;
             }
 
-            var contextSignature = "/" + string.Join("/", frames.Reverse().Select(x => (x.LocalName ?? string.Empty).ToLowerInvariant())) + "/";
-            var markers = _usageMatcher.Find(contextSignature);
-            if (markers.Contains(UsageMarker.Line))
-            {
-                return ColorUsageKind.Line;
-            }
-
-            if (markers.Contains(UsageMarker.Text))
-            {
-                return ColorUsageKind.TextFill;
-            }
-
-            if (markers.Contains(UsageMarker.Effect))
-            {
-                return ColorUsageKind.Effect;
-            }
-
-            return ColorUsageKind.ShapeFill;
+            return kind ?? ColorUsageKind.ShapeFill;
         }
 
         private static IReadOnlyList<OpenXmlPartDescriptor> BuildScanPartDescriptors(PresentationDocument document)
@@ -582,6 +580,15 @@ namespace MorphosPowerPointAddIn.Services
         {
             return localName.Equals("srgbClr", StringComparison.OrdinalIgnoreCase)
                 || localName.Equals("sysClr", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsFontElement(string localName)
+        {
+            return localName.Equals("latin", StringComparison.OrdinalIgnoreCase)
+                || localName.Equals("ea", StringComparison.OrdinalIgnoreCase)
+                || localName.Equals("cs", StringComparison.OrdinalIgnoreCase)
+                || localName.Equals("sym", StringComparison.OrdinalIgnoreCase)
+                || localName.Equals("buFont", StringComparison.OrdinalIgnoreCase);
         }
 
         private static XmlReader CreateReader(Stream stream)
@@ -698,12 +705,7 @@ namespace MorphosPowerPointAddIn.Services
             }
         }
 
-        private enum UsageMarker
-        {
-            Line,
-            Text,
-            Effect
-        }
+
 
         private sealed class OpenXmlPartDescriptor
         {

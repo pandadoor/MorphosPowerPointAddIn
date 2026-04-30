@@ -6,8 +6,10 @@ namespace MorphosPowerPointAddIn.Utilities
 {
     internal sealed class AhoCorasickMatcher<TValue>
     {
-        private readonly Node _root = new Node();
+        private readonly Node _root;
         private readonly IEqualityComparer<TValue> _valueComparer;
+        
+        // Expose to inner node logic if we need to pass the comparer. Since Node is an inner class, we'll pass the comparer into its constructor.
         private bool _built;
 
         public AhoCorasickMatcher()
@@ -18,6 +20,7 @@ namespace MorphosPowerPointAddIn.Utilities
         public AhoCorasickMatcher(IEqualityComparer<TValue> valueComparer)
         {
             _valueComparer = valueComparer ?? EqualityComparer<TValue>.Default;
+            _root = new Node(_valueComparer);
         }
 
         public void Add(string pattern, TValue value)
@@ -34,7 +37,7 @@ namespace MorphosPowerPointAddIn.Utilities
                 Node next;
                 if (!current.Children.TryGetValue(normalized, out next))
                 {
-                    next = new Node();
+                    next = new Node(_valueComparer);
                     current.Children[normalized] = next;
                 }
 
@@ -74,10 +77,7 @@ namespace MorphosPowerPointAddIn.Utilities
 
                     foreach (var output in target.Failure.Outputs)
                     {
-                        if (!target.Outputs.Contains(output, _valueComparer))
-                        {
-                            target.Outputs.Add(output);
-                        }
+                        target.Outputs.Add(output);
                     }
 
                     queue.Enqueue(target);
@@ -104,7 +104,7 @@ namespace MorphosPowerPointAddIn.Utilities
                 Build();
             }
 
-            var values = new List<TValue>();
+            var values = new HashSet<TValue>(_valueComparer);
             var current = _root;
             foreach (var symbol in text)
             {
@@ -122,14 +122,11 @@ namespace MorphosPowerPointAddIn.Utilities
 
                 foreach (var output in current.Outputs)
                 {
-                    if (!values.Contains(output, _valueComparer))
-                    {
-                        values.Add(output);
-                    }
+                    values.Add(output);
                 }
             }
 
-            return values;
+            return values.ToList();
         }
 
         private static char Normalize(char value)
@@ -139,15 +136,15 @@ namespace MorphosPowerPointAddIn.Utilities
 
         private sealed class Node
         {
-            public Node()
+            public Node(IEqualityComparer<TValue> comparer)
             {
                 Children = new Dictionary<char, Node>();
-                Outputs = new List<TValue>();
+                Outputs = new HashSet<TValue>(comparer);
             }
 
             public Dictionary<char, Node> Children { get; }
 
-            public List<TValue> Outputs { get; }
+            public HashSet<TValue> Outputs { get; }
 
             public Node Failure { get; set; }
         }

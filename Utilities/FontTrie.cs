@@ -23,14 +23,16 @@ namespace MorphosPowerPointAddIn.Utilities
                 Node next;
                 if (!current.Children.TryGetValue(key, out next))
                 {
-                    next = new Node();
+                    next = new Node { Key = key };
                     current.Children[key] = next;
                 }
 
+                current.InvalidateSort();
                 current = next;
                 current.PassThroughCount++;
             }
 
+            current.InvalidateSort();
             current.IsTerminal = true;
             current.Value = normalized;
         }
@@ -75,11 +77,9 @@ namespace MorphosPowerPointAddIn.Utilities
                 results.Add(node.Value);
             }
 
-            foreach (var child in node.Children
-                .OrderByDescending(x => x.Value.PassThroughCount)
-                .ThenBy(x => x.Key))
+            foreach (var child in node.GetSortedChildren())
             {
-                Collect(child.Value, results, maximumResults);
+                Collect(child, results, maximumResults);
                 if (results.Count >= maximumResults)
                 {
                     return;
@@ -101,11 +101,32 @@ namespace MorphosPowerPointAddIn.Utilities
 
             public Dictionary<char, Node> Children { get; }
 
+            public char Key { get; set; }
+
             public string Value { get; set; }
 
             public bool IsTerminal { get; set; }
 
             public int PassThroughCount { get; set; }
+
+            private List<Node> _sortedChildren;
+
+            public void InvalidateSort()
+            {
+                _sortedChildren = null;
+            }
+
+            public List<Node> GetSortedChildren()
+            {
+                if (_sortedChildren == null)
+                {
+                    _sortedChildren = Children.Values
+                        .OrderByDescending(x => x.PassThroughCount)
+                        .ThenBy(x => x.Key)
+                        .ToList();
+                }
+                return _sortedChildren;
+            }
         }
     }
 }
